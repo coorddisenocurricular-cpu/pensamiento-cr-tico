@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 1 — Normativas de Clase | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  /* ─── VARIABLES ─────────────────────────────────────────────── */
+  :root {
+    --bg:        #0b0e17;
+    --surface:   #131724;
+    --card:      #1a2035;
+    --border:    #252d45;
+    --accent:    #4f8ef7;
+    --accent2:   #e05c8a;
+    --gold:      #f5c842;
+    --green:     #3dd68c;
+    --text:      #e8eaf2;
+    --muted:     #6b7490;
+    --radius:    14px;
+    --glow:      0 0 28px rgba(79,142,247,.35);
+  }
+
+  /* ─── RESET ─────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND GRID ───────────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(79,142,247,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,142,247,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* ─── WRAPPER ───────────────────────────────────────────────── */
+  #app {
+    position: relative; z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ─── HEADER ────────────────────────────────────────────────── */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: rgba(79,142,247,.15);
+    border: 1px solid rgba(79,142,247,.35);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.7rem, 5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .header p {
+    color: var(--muted);
+    font-size: .95rem;
+    font-weight: 300;
+  }
+
+  /* ─── PROGRESS BAR ──────────────────────────────────────────── */
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    height: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width .6s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* ─── CARD ──────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeUp .4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── PLANTEL TABS ──────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px;
+    margin-bottom: 24px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    padding: 10px 8px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .04em;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--border); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: var(--glow);
+  }
+
+  /* ─── FORM ELEMENTS ─────────────────────────────────────────── */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .form-group input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .98rem;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,142,247,.15);
+  }
+  .form-group input::placeholder { color: var(--muted); }
+
+  /* ─── BUTTONS ───────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-family: 'Syne', sans-serif;
+    font-size: .92rem;
+    font-weight: 700;
+    padding: 13px 26px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .2s;
+    letter-spacing: .04em;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: var(--glow); }
+  .btn:active { transform: translateY(0); }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); box-shadow: none; }
+  .btn-success { background: var(--green); }
+  .btn-gold { background: var(--gold); color: #111; }
+
+  /* ─── LEVEL INDICATORS ──────────────────────────────────────── */
+  .levels-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .level-dot {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all .3s;
+    position: relative;
+  }
+  .level-dot.done {
+    border-color: var(--green);
+    background: rgba(61,214,140,.15);
+    color: var(--green);
+  }
+  .level-dot.active {
+    border-color: var(--accent);
+    background: rgba(79,142,247,.2);
+    color: var(--accent);
+    box-shadow: 0 0 16px rgba(79,142,247,.4);
+    transform: scale(1.1);
+  }
+
+  /* ─── QUESTION CARD ─────────────────────────────────────────── */
+  .q-level-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .q-stem {
+    font-size: 1.08rem;
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .q-stem strong { color: var(--gold); }
+
+  /* ─── OPTIONS ───────────────────────────────────────────────── */
+  .options { display: grid; gap: 10px; }
+  .opt-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .94rem;
+    padding: 14px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(79,142,247,.08);
+    transform: translateX(4px);
+  }
+  .opt-btn .opt-letter {
+    min-width: 26px; height: 26px;
+    border-radius: 6px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .opt-btn.correct {
+    border-color: var(--green);
+    background: rgba(61,214,140,.1);
+    cursor: default;
+  }
+  .opt-btn.correct .opt-letter { background: var(--green); color: #fff; }
+  .opt-btn.wrong {
+    border-color: var(--accent2);
+    background: rgba(224,92,138,.08);
+    cursor: default;
+    opacity: .7;
+  }
+  .opt-btn.wrong .opt-letter { background: var(--accent2); color: #fff; }
+  .opt-btn:disabled { pointer-events: none; }
+
+  /* ─── FEEDBACK ──────────────────────────────────────────────── */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: .9rem;
+    line-height: 1.55;
+    display: none;
+    animation: fadeUp .3s ease;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: rgba(61,214,140,.12); border: 1px solid rgba(61,214,140,.3); color: var(--green); }
+  .feedback.err { background: rgba(224,92,138,.1);  border: 1px solid rgba(224,92,138,.3); color: #f07fa0; }
+
+  /* ─── XP BAR ─────────────────────────────────────────────────── */
+  .xp-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .xp-icon { font-size: 1.3rem; }
+  .xp-label { font-size: .78rem; color: var(--muted); font-weight: 500; }
+  .xp-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--gold);
+    margin-left: auto;
+  }
+
+  /* ─── STREAK ────────────────────────────────────────────────── */
+  .streak-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .streak-star {
+    font-size: 1.4rem;
+    filter: grayscale(1) opacity(.3);
+    transition: filter .4s, transform .4s;
+  }
+  .streak-star.lit { filter: none; transform: scale(1.2); }
+
+  /* ─── TIMER ─────────────────────────────────────────────────── */
+  .timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .timer-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 100px;
+    transition: width .9s linear, background .3s;
+  }
+  .timer-bar-fill.danger { background: var(--accent2); }
+  .timer-num {
+    font-family: 'Syne', sans-serif;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 28px;
+    text-align: right;
+  }
+  .timer-num.danger { color: var(--accent2); }
+
+  /* ─── RESULT ────────────────────────────────────────────────── */
+  .result-trophy { font-size: 4rem; text-align: center; margin: 10px 0 16px; }
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .result-sub { text-align: center; color: var(--muted); margin-bottom: 24px; }
+  .result-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .stat-box .sv {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-box .sl { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+  /* ─── SPINNER ───────────────────────────────────────────────── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── SECTION TITLE ─────────────────────────────────────────── */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── HIDDEN ────────────────────────────────────────────────── */
+  .hidden { display: none !important; }
+
+  /* ─── TOAST ─────────────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: .88rem;
+    z-index: 9999;
+    animation: slideIn .3s ease;
+    max-width: 300px;
+  }
+  .toast.ok  { border-color: var(--green); }
+  .toast.err { border-color: var(--accent2); }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (max-width: 500px) {
+    .card { padding: 22px 18px; }
+    .result-stats { grid-template-columns: 1fr 1fr; }
+    .tab-btn { font-size: .72rem; padding: 9px 4px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════ -->
+  <div class="header">
+    <div class="badge">Pensamiento Crítico · UVP</div>
+    <h1>Semana 1<br>Normativas de Clase</h1>
+    <p>6 niveles · Gana XP · Demuestra lo que aprendiste</p>
+  </div>
+
+  <!-- ══ SCREEN 1 — LOGIN ═════════════════════════════════════════ -->
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+
+    <!-- Plantel tabs -->
+    <div class="tabs" id="plantel-tabs">
+      <button class="tab-btn active" data-plantel="Puebla"    onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán"  onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala"  onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-nombre" placeholder="Ej. María González López" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label>Matrícula</label>
+      <input type="text" id="inp-matricula" placeholder="Ej. 2023001234"
+             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12" />
+    </div>
+
+    <button class="btn btn-full" onclick="startGame()">
+      <span>Comenzar actividad</span> <span>→</span>
+    </button>
+  </div>
+
+  <!-- ══ SCREEN 2 — GAME ══════════════════════════════════════════ -->
+  <div id="screen-game" class="hidden">
+
+    <!-- XP + streak -->
+    <div class="xp-row">
+      <span class="xp-icon">⚡</span>
+      <div>
+        <div class="xp-label">XP acumulados</div>
+      </div>
+      <div class="xp-val" id="xp-display">0 XP</div>
+    </div>
+
+    <div class="streak-row" id="streak-row">
+      <span class="streak-star" id="st0">⭐</span>
+      <span class="streak-star" id="st1">⭐</span>
+      <span class="streak-star" id="st2">⭐</span>
+      <span class="streak-star" id="st3">⭐</span>
+      <span class="streak-star" id="st4">⭐</span>
+      <span class="streak-star" id="st5">⭐</span>
+    </div>
+
+    <!-- Level dots -->
+    <div class="levels-row" id="levels-row"></div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label">
+      <span id="prog-label">Nivel 1 de 6</span>
+      <span id="prog-pct">0%</span>
+    </div>
+
+    <!-- Question card -->
+    <div class="card" id="q-card">
+      <div class="timer-wrap">
+        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+        <div class="timer-num" id="timer-num">30</div>
+      </div>
+
+      <div class="q-level-tag" id="q-level-tag">Nivel 1</div>
+      <div class="q-stem"      id="q-stem"></div>
+      <div class="options"     id="options"></div>
+      <div class="feedback"    id="feedback"></div>
+
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextQuestion()" style="margin-top:18px">
+        Siguiente nivel →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3 — RESULT ════════════════════════════════════════ -->
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title"  id="result-title">¡Actividad completada!</div>
+    <div class="result-sub"    id="result-sub"></div>
+
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()">
+      <span id="save-label">Guardar resultado</span>
+    </button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">
+      Reintentar actividad
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG — pega aquí el URL de tu Web App de Apps Script
+// ═══════════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+// ═══════════════════════════════════════════════════════════════════
+// PREGUNTAS — 6 niveles, con mecánica distinta cada uno
+// ═══════════════════════════════════════════════════════════════════
+const LEVELS = [
+  {
+    id: 1,
+    tag: "Nivel 1 — Reconocimiento",
+    xp: 50,
+    time: 30,
+    stem: "¿Cuál de los siguientes documentos forma parte de la <strong>Secuencia Didáctica AMOXTLI</strong> que se revisa en la Semana 1?",
+    opts: [
+      "El examen final del cuatrimestre",
+      "La secuencia didáctica, políticas y firmas del grupo",
+      "El reglamento de laboratorios solamente",
+      "El plan de estudios de la licenciatura"
+    ],
+    correct: 1,
+    fb_ok: "✅ Correcto. La Semana 1 dedica tiempo a revisar la secuencia didáctica (AMOXTLI), las políticas del curso y la firma de enterados del grupo.",
+    fb_err: "La Semana 1 cubre la secuencia didáctica, políticas y firmas — los documentos que establecen el acuerdo de trabajo entre docente y estudiantes."
+  },
+  {
+    id: 2,
+    tag: "Nivel 2 — Comprensión",
+    xp: 75,
+    time: 30,
+    stem: "Según las <strong>políticas del curso</strong>, ¿por cuál medio oficial está permitido comunicarse de forma asíncrona con el docente?",
+    opts: [
+      "Grupos de WhatsApp del grupo",
+      "Correo electrónico institucional y Chat de Google Suite",
+      "Instagram o Facebook del docente",
+      "Mensajes directos por cualquier red social"
+    ],
+    correct: 1,
+    fb_ok: "✅ Exacto. Las políticas establecen que la comunicación asíncrona debe hacerse por correo institucional o la suite oficial de Google. Las redes sociales no son medios reconocidos.",
+    fb_err: "Las políticas prohíben grupos de chat por redes sociales. Los canales válidos son el correo institucional y el Chat de Google Suite."
+  },
+  {
+    id: 3,
+    tag: "Nivel 3 — Aplicación",
+    xp: 100,
+    time: 25,
+    stem: "Un estudiante llega <strong>8 minutos tarde</strong> al salón. Las políticas del curso indican una tolerancia de <strong>5 minutos</strong>. ¿Qué implica esto para el estudiante?",
+    opts: [
+      "Puede entrar sin ninguna consecuencia porque llegó dentro de la hora",
+      "Superó el tiempo de tolerancia establecido en el AMOXTLI",
+      "Tiene derecho a 10 minutos de tolerancia por ser el primer módulo",
+      "La tolerancia no aplica para la Semana 1"
+    ],
+    correct: 1,
+    fb_ok: "✅ Correcto. La política es clara: la tolerancia es de 5 minutos. Llegar a los 8 minutos supera ese límite según lo acordado en el AMOXTLI.",
+    fb_err: "La tolerancia pactada en el AMOXTLI es de 5 minutos. 8 minutos la supera. El estudiante debe conocer y respetar lo acordado desde la Semana 1."
+  },
+  {
+    id: 4,
+    tag: "Nivel 4 — Análisis",
+    xp: 125,
+    time: 25,
+    stem: "¿Cuál es el <strong>propósito principal</strong> del Diagnóstico Inicial que se aplica en la Semana 1?",
+    opts: [
+      "Asignar la calificación del primer parcial desde el inicio",
+      "Conocer los saberes previos de los estudiantes para orientar la enseñanza",
+      "Evaluar si el alumno aprobó la materia de Lógica en bachillerato",
+      "Determinar qué alumnos no necesitan cursar la materia"
+    ],
+    correct: 1,
+    fb_ok: "✅ Bien. El diagnóstico inicial sirve para que el docente identifique los conocimientos y habilidades previas del grupo, no para calificar.",
+    fb_err: "El diagnóstico inicial es una herramienta formativa: detecta puntos de partida. No genera calificación ni filtra estudiantes."
+  },
+  {
+    id: 5,
+    tag: "Nivel 5 — Evaluación",
+    xp: 150,
+    time: 20,
+    stem: "Lee el siguiente <strong>escenario</strong> y selecciona la opción que viola las políticas del curso:<br><br><em>\"Carlos usa su laptop durante clase para tomar apuntes. Ana toma fotos del pizarrón con su celular con permiso previo del docente. Luis graba la sesión en video sin avisar ni pedir consentimiento.\"</em>",
+    opts: [
+      "La acción de Carlos",
+      "La acción de Ana",
+      "La acción de Luis",
+      "Ninguna de las tres viola las políticas"
+    ],
+    correct: 2,
+    fb_ok: "✅ Perfecto. Luis viola las políticas: grabar audio o video requiere consentimiento de los involucrados y que esté contemplado en la planeación del docente.",
+    fb_err: "Luis graba sin permiso ni consentimiento. Las políticas son explícitas: cualquier grabación requiere autorización previa y fin académico."
+  },
+  {
+    id: 6,
+    tag: "Nivel 6 — Creación / Síntesis",
+    xp: 200,
+    time: 20,
+    stem: "El <strong>Modelo Educativo Tlamatini</strong> y la filosofía institucional de la UVP se mencionan en el AMOXTLI como guías del comportamiento. ¿Qué enunciado describe mejor su relevancia en el curso de Pensamiento Crítico?",
+    opts: [
+      "Son requisitos administrativos que no tienen relación con el aprendizaje del curso",
+      "Establecen valores y principios que deben reflejarse en el comportamiento dentro y fuera del aula",
+      "Solo aplican para docentes, no para estudiantes",
+      "Son únicamente relevantes para actividades extracurriculares"
+    ],
+    correct: 1,
+    fb_ok: "✅ Excelente. El modelo Tlamatini no es decorativo: sus valores deben permear el comportamiento cotidiano en todas las instalaciones universitarias.",
+    fb_err: "La filosofía Tlamatini aplica a toda la comunidad educativa — estudiantes y docentes — en todos los espacios universitarios."
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let state = {
+  plantel:   "Puebla",
+  nombre:    "",
+  matricula: "",
+  current:   0,
+  xp:        0,
+  correct:   0,
+  startTime: null,
+  levelTimes:[],
+  timer:     null,
+  timeLeft:  30,
+  answered:  false
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// PLANTEL SELECTION
+// ═══════════════════════════════════════════════════════════════════
+function selectPlantel(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.plantel = btn.dataset.plantel;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════════════
+function startGame() {
+  const nombre    = document.getElementById('inp-nombre').value.trim();
+  const matricula = document.getElementById('inp-matricula').value.trim();
+  if (!nombre)    { showToast("Escribe tu nombre completo", "err"); return; }
+  if (matricula.length < 5) { showToast("Matrícula inválida (mín. 5 caracteres)", "err"); return; }
+
+  state.nombre    = nombre;
+  state.matricula = matricula;
+  state.current   = 0;
+  state.xp        = 0;
+  state.correct   = 0;
+  state.startTime = Date.now();
+  state.levelTimes= [];
+
+  show('screen-game');
+  hide('screen-login');
+  buildLevelDots();
+  loadQuestion();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BUILD LEVEL DOTS
+// ═══════════════════════════════════════════════════════════════════
+function buildLevelDots() {
+  const row = document.getElementById('levels-row');
+  row.innerHTML = '';
+  LEVELS.forEach((l, i) => {
+    const d = document.createElement('div');
+    d.className = 'level-dot' + (i === 0 ? ' active' : '');
+    d.id = 'dot-' + i;
+    d.textContent = i + 1;
+    row.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOAD QUESTION
+// ═══════════════════════════════════════════════════════════════════
+function loadQuestion() {
+  const lvl = LEVELS[state.current];
+  state.answered = false;
+
+  // dots
+  document.querySelectorAll('.level-dot').forEach((d, i) => {
+    d.className = 'level-dot' + (i < state.current ? ' done' : '') + (i === state.current ? ' active' : '');
+    d.textContent = i < state.current ? '✓' : i + 1;
+  });
+
+  // progress
+  const pct = Math.round((state.current / LEVELS.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `Nivel ${state.current + 1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+
+  // question
+  document.getElementById('q-level-tag').textContent = lvl.tag;
+  document.getElementById('q-stem').innerHTML = lvl.stem;
+
+  // options
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  lvl.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt-btn';
+    b.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${o}</span>`;
+    b.onclick = () => answer(i, b);
+    opts.appendChild(b);
+  });
+
+  // feedback + next
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  document.getElementById('btn-next').classList.add('hidden');
+
+  // timer
+  startTimer(lvl.time);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════════
+function startTimer(seconds) {
+  clearInterval(state.timer);
+  state.timeLeft = seconds;
+  const bar = document.getElementById('timer-bar');
+  const num = document.getElementById('timer-num');
+  bar.className = 'timer-bar-fill';
+  num.className = 'timer-num';
+
+  updateTimerUI(seconds, seconds);
+
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI(state.timeLeft, seconds);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      if (!state.answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(t, total) {
+  const pct = (t / total) * 100;
+  const bar = document.getElementById('timer-bar');
+  const num = document.getElementById('timer-num');
+  bar.style.width = pct + '%';
+  num.textContent = t;
+  const danger = t <= 8;
+  bar.className = 'timer-bar-fill' + (danger ? ' danger' : '');
+  num.className = 'timer-num'       + (danger ? ' danger' : '');
+}
+
+function timeOut() {
+  if (state.answered) return;
+  state.answered = true;
+  state.levelTimes.push(LEVELS[state.current].time);
+  // reveal correct
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === LEVELS[state.current].correct) b.classList.add('correct');
+  });
+  showFeedback(false, "⏱ ¡Tiempo agotado! " + LEVELS[state.current].fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ANSWER
+// ═══════════════════════════════════════════════════════════════════
+function answer(idx, btn) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timer);
+  const elapsed = LEVELS[state.current].time - state.timeLeft;
+  state.levelTimes.push(elapsed);
+
+  const lvl = LEVELS[state.current];
+  const ok  = idx === lvl.correct;
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === lvl.correct) b.classList.add('correct');
+    else if (i === idx && !ok) b.classList.add('wrong');
+  });
+
+  if (ok) {
+    // time bonus: up to +50 extra for fast answers
+    const timeBonus = Math.round((state.timeLeft / lvl.time) * 50);
+    const earned = lvl.xp + timeBonus;
+    state.xp      += earned;
+    state.correct += 1;
+    // streak star
+    document.getElementById('st' + state.current).classList.add('lit');
+    showFeedback(true, lvl.fb_ok + (timeBonus ? ` <em>+${timeBonus} XP bonus por rapidez 🚀</em>` : ''));
+    document.getElementById('xp-display').textContent = state.xp + ' XP';
+  } else {
+    showFeedback(false, lvl.fb_err);
+  }
+
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  fb.innerHTML = msg;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NEXT QUESTION / END
+// ═══════════════════════════════════════════════════════════════════
+function nextQuestion() {
+  state.current++;
+  if (state.current >= LEVELS.length) {
+    showResult();
+  } else {
+    loadQuestion();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESULT SCREEN
+// ═══════════════════════════════════════════════════════════════════
+function showResult() {
+  hide('screen-game');
+  show('screen-result');
+
+  const totalTime = Math.round((Date.now() - state.startTime) / 1000);
+  const pct = Math.round((state.correct / LEVELS.length) * 100);
+
+  let trophy = '🥉', title = '¡Actividad completada!', sub = 'Puedes intentarlo de nuevo para mejorar tu puntaje.';
+  if (pct >= 83) { trophy = '🏆'; title = '¡Excelente dominio!'; sub = 'Estás listo para el siguiente nivel. Comparte tu resultado.'; }
+  else if (pct >= 60) { trophy = '🥈'; title = '¡Buen trabajo!'; sub = 'Repasa los temas en los que fallaste y vuelve a intentar.'; }
+
+  document.getElementById('result-trophy').textContent = trophy;
+  document.getElementById('result-title').textContent  = title;
+  document.getElementById('result-sub').textContent    = sub;
+  document.getElementById('r-correct').textContent = `${state.correct}/6`;
+  document.getElementById('r-xp').textContent      = state.xp;
+  document.getElementById('r-time').textContent    = totalTime + 's';
+
+  // store for save
+  state._totalTime = totalTime;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SAVE TO GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════════════
+async function saveResult() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "PEGA_TU_URL_AQUI") {
+    showToast("⚠ Configura el URL del Apps Script primero", "err");
+    return;
+  }
+
+  const btn = document.getElementById('btn-save');
+  const lbl = document.getElementById('save-label');
+  btn.disabled = true;
+  lbl.innerHTML = '<span class="spinner"></span> Guardando...';
+
+  const payload = {
+    plantel:        state.plantel,
+    matricula:      state.matricula,
+    nombre:         state.nombre,
+    semana:         1,
+    tema:           "Normativas de Clase",
+    correctas:      state.correct,
+    total:          LEVELS.length,
+    xp:             state.xp,
+    porcentaje:     Math.round((state.correct / LEVELS.length) * 100),
+    tiempoTotal:    state._totalTime,
+    fecha:          new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    showToast("✅ Resultado guardado correctamente", "ok");
+    lbl.textContent = "✓ Guardado";
+  } catch (e) {
+    showToast("❌ Error al guardar. Verifica conexión.", "err");
+    btn.disabled = false;
+    lbl.textContent = "Reintentar guardar";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════════════════
+function resetAll() {
+  hide('screen-result');
+  hide('screen-game');
+  show('screen-login');
+  // reset stars
+  for (let i = 0; i < 6; i++) document.getElementById('st' + i).classList.remove('lit');
+  document.getElementById('xp-display').textContent = '0 XP';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+</body>
+</html>
