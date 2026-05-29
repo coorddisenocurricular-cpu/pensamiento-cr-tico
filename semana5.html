@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 5 — Reglas de Inferencia | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0c0f; --surface:#111418; --card:#181d24; --border:#222c36;
+    --accent:#f0c040; --accent2:#4cc9f0; --green:#57cc99; --red:#e63946;
+    --orange:#fb8500; --purple:#b5179e; --text:#e8ecf0; --muted:#4a5a6a;
+    --radius:14px; --glow:0 0 28px rgba(240,192,64,.25);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px}
+  body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(240,192,64,.07) 0%,transparent 55%),
+               radial-gradient(ellipse 50% 40% at 90% 100%,rgba(76,201,240,.05) 0%,transparent 50%);
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:36px 0 28px}
+  .badge{display:inline-block;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.28);
+    color:var(--accent);font-family:'Fira Code',monospace;font-size:.65rem;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-family:'Fraunces',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;
+    line-height:1.1;color:var(--text);margin-bottom:10px}
+  .header h1 em{font-style:italic;color:var(--accent)}
+  .header p{color:var(--muted);font-size:.9rem}
+
+  /* INFERENCE CARDS STRIP */
+  .rules-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}
+  .rule-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center}
+  .rule-card .rname{font-family:'Fraunces',serif;font-size:.72rem;font-weight:600;color:var(--accent);margin-bottom:6px;letter-spacing:.04em}
+  .rule-card .rform{font-family:'Fira Code',monospace;font-size:.7rem;color:var(--muted);line-height:1.6}
+  .rule-card .rform .conc{color:var(--accent2);font-weight:600}
+
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:700;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--accent);color:#0a0c0f;box-shadow:var(--glow)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Manrope',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,192,64,.1)}
+  .form-group input::placeholder{color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0a0c0f;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:.92rem;font-weight:800;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);box-shadow:none}
+  .btn-gold{background:var(--accent);color:#0a0c0f}
+  .btn-blue{background:var(--accent2);color:#0a0c0f}
+
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'Fira Code',monospace;font-size:1.1rem;font-weight:600;color:var(--accent);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:.75rem;font-weight:600;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(87,204,153,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--accent);background:rgba(240,192,64,.12);color:var(--accent);box-shadow:0 0 16px rgba(240,192,64,.35);transform:scale(1.1)}
+
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'Fira Code',monospace;font-size:.88rem;font-weight:600;color:var(--accent);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+
+  .q-level-tag{font-family:'Fira Code',monospace;font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .q-stem{font-size:1.02rem;font-weight:500;line-height:1.68;margin-bottom:22px;color:var(--text)}
+  .q-stem strong{color:var(--accent);font-weight:700}
+  .q-stem em{color:var(--accent2);font-style:normal;font-weight:600}
+  .mono{font-family:'Fira Code',monospace;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:.88em;color:var(--accent)}
+
+  /* PROOF BOX */
+  .proof-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:18px;font-family:'Fira Code',monospace;font-size:.9rem}
+  .proof-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .proof-row:last-child{border-bottom:none}
+  .proof-num{color:var(--muted);font-size:.75rem;min-width:24px;text-align:right;flex-shrink:0}
+  .proof-formula{color:var(--accent2);flex:1}
+  .proof-reason{color:var(--muted);font-size:.75rem;font-style:italic;text-align:right;flex-shrink:0}
+  .proof-row.conclusion .proof-formula{color:var(--green);font-weight:600}
+  .proof-row.gap .proof-formula{color:transparent;background:var(--border);border-radius:4px;min-width:80px}
+  .proof-row.gap .proof-reason{color:transparent;background:var(--border);border-radius:4px;min-width:60px}
+
+  /* OPTIONS */
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Manrope',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(240,192,64,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:.75rem;font-weight:600;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(87,204,153,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#0a0c0f}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+
+  /* TF */
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Manrope',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .tf-chip:hover:not(:disabled){border-color:var(--accent);background:rgba(240,192,64,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(87,204,153,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+
+  /* ARGUMENT EVALUATOR */
+  .arg-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+  .arg-premises{margin-bottom:12px}
+  .arg-premise{font-family:'Fira Code',monospace;font-size:.88rem;padding:6px 0;color:var(--text);display:flex;align-items:center;gap:10px}
+  .arg-premise::before{content:'P';background:rgba(76,201,240,.15);color:var(--accent2);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:700;flex-shrink:0}
+  .arg-divider{height:1px;background:var(--border);margin:12px 0;position:relative}
+  .arg-divider::after{content:'∴';position:absolute;right:0;top:-10px;font-family:'Fira Code',monospace;color:var(--accent);font-size:.9rem}
+  .arg-conclusion{font-family:'Fira Code',monospace;font-size:.88rem;color:var(--green);font-weight:600;display:flex;align-items:center;gap:10px}
+  .arg-conclusion::before{content:'C';background:rgba(87,204,153,.15);color:var(--green);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:700;flex-shrink:0}
+  .validity-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .v-btn{padding:14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Manrope',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .v-btn:hover:not(:disabled){background:rgba(240,192,64,.07);border-color:var(--accent)}
+  .v-btn.correct-v{border-color:var(--green);background:rgba(87,204,153,.1);color:var(--green)}
+  .v-btn.wrong-v{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.65}
+  .v-btn:disabled{pointer-events:none}
+
+  /* DRAG PROOF STEPS */
+  .proof-drag-list{display:grid;gap:8px;margin-bottom:14px}
+  .proof-drag-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;cursor:grab;display:flex;align-items:center;gap:12px;font-family:'Fira Code',monospace;font-size:.85rem;transition:border-color .2s,transform .15s;user-select:none}
+  .proof-drag-item:active{cursor:grabbing}
+  .proof-drag-item.dragging{opacity:.45;transform:scale(.97)}
+  .proof-drag-item.drag-over-item{border-color:var(--accent);background:rgba(240,192,64,.07)}
+  .proof-step-num{color:var(--muted);font-size:.72rem;min-width:22px;flex-shrink:0}
+  .proof-step-formula{color:var(--accent2);flex:1}
+  .proof-step-reason{color:var(--muted);font-size:.72rem;text-align:right}
+
+  /* FALLACY SPOT */
+  .fallacy-choices{display:grid;gap:8px;margin-bottom:12px}
+  .fallacy-opt{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;font-family:'Fira Code',monospace;font-size:.88rem;transition:all .2s;display:flex;align-items:center;gap:12px}
+  .fallacy-opt:hover:not(:disabled){border-color:var(--orange);background:rgba(251,133,0,.07)}
+  .fallacy-opt .fo-num{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);flex-shrink:0}
+  .fallacy-opt.correct-fo{border-color:var(--green);background:rgba(87,204,153,.07)}
+  .fallacy-opt.correct-fo .fo-num{background:var(--green);color:#0a0c0f}
+  .fallacy-opt.wrong-fo{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .fallacy-opt.wrong-fo .fo-num{background:var(--red);color:#fff}
+  .fallacy-opt:disabled{pointer-events:none}
+
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(87,204,153,.09);border:1px solid rgba(87,204,153,.25);color:var(--green)}
+  .feedback.err{background:rgba(230,57,70,.07);border:1px solid rgba(230,57,70,.2);color:var(--red)}
+
+  .section-title{font-family:'Manrope',sans-serif;font-size:1.05rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .result-trophy{font-size:4rem;text-align:center;margin:10px 0 16px}
+  .result-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:700;text-align:center;margin-bottom:8px}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.92rem}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'Fira Code',monospace;font-size:1.5rem;font-weight:600;color:var(--accent)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(10,12,15,.3);border-top-color:#0a0c0f;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){
+    .card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}
+    .tab-btn{font-size:.72rem;padding:9px 4px}.rules-strip{grid-template-columns:1fr 1fr}.validity-btns{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">∴ Semana 5 · Pensamiento Crítico · UVP</div>
+    <h1>Reglas de <em>Inferencia</em></h1>
+    <p>Modus Ponens · Modus Tollens · Silogismo Hipotético · Silogismo Disyuntivo</p>
+  </div>
+
+  <!-- Reference strip -->
+  <div class="rules-strip">
+    <div class="rule-card">
+      <div class="rname">Modus Ponens</div>
+      <div class="rform">p → q<br>p<br><span class="conc">∴ q</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rname">Modus Tollens</div>
+      <div class="rform">p → q<br>¬q<br><span class="conc">∴ ¬p</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rname">Sil. Hipotético</div>
+      <div class="rform">p → q<br>q → r<br><span class="conc">∴ p → r</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rname">Sil. Disyuntivo</div>
+      <div class="rform">p ∨ q<br>¬p<br><span class="conc">∴ q</span></div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs" id="plantel-tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Ej. Sofía Hernández Cruz"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="hidden">
+    <div class="xp-row">
+      <span style="font-size:1.3rem">⚡</span>
+      <div class="xp-label">XP acumulados</div>
+      <div class="xp-val" id="xp-display">0 XP</div>
+    </div>
+    <div class="streak-row">
+      <span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span>
+      <span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span>
+      <span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span>
+    </div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap">
+        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+        <div class="timer-num" id="timer-num">30</div>
+      </div>
+      <div class="q-level-tag" id="q-level-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title"  id="result-title">¡Completado!</div>
+    <div class="result-sub"    id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">Guardar resultado</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+const LEVELS=[
+  /* L1 MCQ — identifica la regla */
+  {id:1,tag:"Nivel 1 — Identifica la regla",xp:50,time:28,type:"mcq",
+   stem:"Dado el argumento:<br><br><span class='mono'>Si estudio, entonces apruebo. Estudio.</span><br><span class='mono'>∴ Apruebo.</span><br><br>¿Qué regla de inferencia se usó?",
+   opts:["Modus Tollens","Silogismo Disyuntivo","Modus Ponens","Silogismo Hipotético"],
+   correct:2,
+   fb_ok:"✅ Correcto. Modus Ponens: tenemos p → q y p, por lo tanto concluimos q.",
+   fb_err:"Es Modus Ponens: afirmar el antecedente (p → q, p) para concluir el consecuente (q)."},
+
+  /* L2 MCQ — identifica la regla 2 */
+  {id:2,tag:"Nivel 2 — Identifica la regla",xp:70,time:28,type:"mcq",
+   stem:"Dado el argumento:<br><br><span class='mono'>p → q &nbsp; q → r</span><br><span class='mono'>∴ p → r</span><br><br>¿Qué regla de inferencia es?",
+   opts:["Modus Ponens","Modus Tollens","Silogismo Disyuntivo","Silogismo Hipotético"],
+   correct:3,
+   fb_ok:"✅ Silogismo Hipotético. Dos condicionales encadenados (p→q y q→r) nos dan el condicional transitivo (p→r).",
+   fb_err:"Es el Silogismo Hipotético: encadena dos condicionales para obtener un condicional más largo."},
+
+  /* L3 TF — ¿es válido este Modus Tollens? */
+  {id:3,tag:"Nivel 3 — ¿Es válido?",xp:80,time:25,type:"tf",
+   stem:"Analiza el argumento: <br><br><span class='mono'>Si hay fuego, entonces hay humo.</span><br><span class='mono'>No hay humo.</span><br><span class='mono'>∴ No hay fuego.</span><br><br>¿Es un argumento <strong>válido</strong>?",
+   correct:true,
+   fb_ok:"✅ Válido. Es Modus Tollens perfecto: p → q, ¬q, ∴ ¬p. Si no hay consecuente (humo), negamos el antecedente (fuego).",
+   fb_err:"Es Verdadero — sí es válido. Estructura: p→q, ¬q, ∴ ¬p. Es Modus Tollens, una de las reglas de inferencia fundamentales."},
+
+  /* L4 Arg evaluator — válido vs inválido con falacias */
+  {id:4,tag:"Nivel 4 — Válido o Inválido",xp:110,time:30,type:"validity",
+   stem:"Lee el argumento. Decide si es <strong>Válido</strong> (sigue correctamente una regla de inferencia) o <strong>Inválido</strong> (comete una falacia formal).",
+   arg:{
+     premises:["Si apruebo el examen, entonces festejo. (p → q)","Festejo. (q)"],
+     conclusion:"Por lo tanto, aprobé el examen. (p)"
+   },
+   correct:"invalid",
+   fb_ok:"✅ Correcto — es INVÁLIDO. Es la falacia de «Afirmación del consecuente»: tener q no implica p. Que celebres no significa que aprobaste.",
+   fb_err:"Es INVÁLIDO. Confirmar el consecuente (q) no nos permite deducir el antecedente (p). Eso se llama «Afirmación del consecuente» y es una falacia formal."},
+
+  /* L5 Drag to complete proof */
+  {id:5,tag:"Nivel 5 — Ordena la deducción",xp:150,time:40,type:"order_proof",
+   stem:"Los pasos de esta deducción están desordenados. <strong>Ordénalos</strong> para que el argumento sea válido de arriba a abajo.",
+   steps:[
+     {text:"p ∨ q  &nbsp;&nbsp; (Estudio o trabajo)",  order:1},
+     {text:"¬p &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (No estudio)",              order:2},
+     {text:"∴ q &nbsp;&nbsp;&nbsp;&nbsp; (Por lo tanto, trabajo)", order:3},
+     {text:"Regla: Silogismo Disyuntivo",               order:4},
+   ],
+   fb_ok:"✅ ¡Orden correcto! Premisa disyuntiva → negación de una parte → conclusión del otro disyunto → nombre de la regla.",
+   fb_err:"El orden correcto es: 1) premisa disyuntiva (p∨q), 2) negación de p (¬p), 3) conclusión q, 4) nombre de la regla aplicada."},
+
+  /* L6 Fallacy spotter */
+  {id:6,tag:"Nivel 6 — Detecta la falacia",xp:200,time:32,type:"fallacy",
+   stem:"Uno de los siguientes cuatro argumentos <strong>comete la falacia de Negación del Antecedente</strong> (decir «no p, por tanto no q»). Identifícalo.",
+   items:[
+     {text:"p → q,  p  ∴ q",         valid:true,  label:"Modus Ponens (válido)"},
+     {text:"p → q,  ¬q  ∴ ¬p",       valid:true,  label:"Modus Tollens (válido)"},
+     {text:"p → q,  ¬p  ∴ ¬q",       valid:false, label:"Negación del Antecedente (falacia)"},
+     {text:"p ∨ q,  ¬p  ∴ q",        valid:true,  label:"Silogismo Disyuntivo (válido)"},
+   ],
+   correct:2,
+   fb_ok:"✅ ¡Detectado! Negar el antecedente (¬p) no nos permite negar el consecuente (¬q). Es una falacia formal muy común.",
+   fb_err:"La falacia de Negación del Antecedente es la tercera: p→q, ¬p, ∴ ¬q. Negar la condición no niega el resultado."}
+];
+
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,orderDrag:null};
+
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim();
+  const m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}
+  if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){
+  const r=document.getElementById('levels-row');r.innerHTML='';
+  LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)});
+}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.orderDrag=null;
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-level-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({mcq:renderMCQ,tf:renderTF,validity:renderValidity,order_proof:renderOrderProof,fallacy:renderFallacy})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+
+/* MCQ */
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* TF */
+function renderTF(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Válido / Verdadero</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Inválido / Falso</button></div>`;
+}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* VALIDITY */
+function renderValidity(lvl,body){
+  let pHTML=lvl.arg.premises.map(p=>`<div class="arg-premise">${p}</div>`).join('');
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="arg-box">
+    <div class="arg-premises">${pHTML}</div>
+    <div class="arg-divider"></div>
+    <div class="arg-conclusion">${lvl.arg.conclusion}</div>
+  </div>
+  <div class="validity-btns">
+    <button class="v-btn" onclick="answerValidity('valid')">✓ Válido</button>
+    <button class="v-btn" onclick="answerValidity('invalid')">✗ Inválido (falacia)</button>
+  </div>`;
+}
+function answerValidity(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  document.querySelectorAll('.v-btn').forEach(b=>{b.disabled=true;if(b.textContent.includes('Válido')&&!b.textContent.includes('Inválido')){if(lvl.correct==='valid')b.classList.add('correct-v');else if(val==='valid')b.classList.add('wrong-v');}else{if(lvl.correct==='invalid')b.classList.add('correct-v');else if(val==='invalid')b.classList.add('wrong-v');}});
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* ORDER PROOF */
+function renderOrderProof(lvl,body){
+  const shuffled=[...lvl.steps].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="proof-drag-list" id="pdl"></div>
+  <button class="btn btn-full btn-blue" id="btn-check-proof" onclick="checkOrderProof()">Verificar orden ✓</button>`;
+  const list=body.querySelector('#pdl');
+  shuffled.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='proof-drag-item';d.dataset.order=s.order;d.draggable=true;
+    d.innerHTML=`<span class="proof-step-num">#${i+1}</span><span class="proof-step-formula">${s.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDrag=d;d.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    d.addEventListener('dragend',()=>{d.classList.remove('dragging');S.orderDrag=null});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('drag-over-item')});
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over-item'));
+    d.addEventListener('drop',e=>{
+      e.preventDefault();d.classList.remove('drag-over-item');
+      if(S.orderDrag&&S.orderDrag!==d){
+        const items=[...list.children];const a=items.indexOf(S.orderDrag),b=items.indexOf(d);
+        if(a<b)list.insertBefore(S.orderDrag,d.nextSibling);else list.insertBefore(S.orderDrag,d);
+        [...list.children].forEach((el,i)=>el.querySelector('.proof-step-num').textContent='#'+(i+1));
+      }
+    });
+    list.appendChild(d);
+  });
+}
+function checkOrderProof(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const list=document.getElementById('pdl');
+  let ok=true;
+  [...list.children].forEach((el,i)=>{
+    const correct=parseInt(el.dataset.order)===i+1;
+    if(!correct)ok=false;
+    el.style.borderColor=correct?'var(--green)':'var(--red)';
+    el.style.background=correct?'rgba(87,204,153,.07)':'rgba(230,57,70,.07)';
+  });
+  document.getElementById('btn-check-proof').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* FALLACY */
+function renderFallacy(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="fallacy-choices" id="fchoices"></div>`;
+  const container=body.querySelector('#fchoices');
+  lvl.items.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='fallacy-opt';
+    d.innerHTML=`<span class="fo-num">${i+1}</span><span style="font-family:'Fira Code',monospace;flex:1">${item.text}</span><span style="font-size:.75rem;color:var(--muted)">${item.label}</span>`;
+    d.onclick=()=>answerFallacy(i,lvl);container.appendChild(d);
+  });
+}
+function answerFallacy(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const ok=idx===lvl.correct;
+  document.querySelectorAll('.fallacy-opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===lvl.correct)b.classList.add('correct-fo');
+    else if(i===idx&&!ok)b.classList.add('wrong-fo');
+  });
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* TIMER */
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;
+  const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}
+    if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}
+  },1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;
+  const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  document.querySelectorAll('.v-btn,.fallacy-opt').forEach(b=>b.disabled=true);
+  ['btn-check-proof'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function earnXP(lvl){
+  const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;
+  document.getElementById('st'+S.cur).classList.add('lit');
+  document.getElementById('xp-display').textContent=S.xp+' XP';
+  showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP bonus ⚡</em>`:''));
+}
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='¡Actividad completada!',sub='Repasa las reglas de inferencia y vuelve a intentar.';
+  if(pct>=83){trophy='🏆';title='¡Maestro de la deducción!';sub='Dominas las reglas de inferencia. ¡A la Semana 6!';}
+  else if(pct>=60){trophy='🥈';title='¡Buen razonamiento!';sub='Presta atención a las falacias formales.';}
+  document.getElementById('result-trophy').textContent=trophy;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;
+  document.getElementById('r-xp').textContent=S.xp;
+  document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');
+  btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:5,tema:"Reglas de Inferencia",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado guardado','ok');lbl.textContent='✓ Guardado';}
+  catch(e){showToast('❌ Error al guardar','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>
