@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 3 — Conectivas Lógicas | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0d0a1a;
+    --surface: #150f2a;
+    --card:    #1c1535;
+    --border:  #2a2048;
+    --accent:  #a855f7;
+    --accent2: #06b6d4;
+    --gold:    #fbbf24;
+    --green:   #34d399;
+    --red:     #f87171;
+    --orange:  #fb923c;
+    --text:    #ede9f8;
+    --muted:   #6b5f8a;
+    --radius:  14px;
+    --glow:    0 0 32px rgba(168,85,247,.3);
+    --glow2:   0 0 24px rgba(6,182,212,.25);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 5%,  rgba(168,85,247,.09) 0%, transparent 55%),
+      radial-gradient(ellipse 55% 40% at 90% 85%, rgba(6,182,212,.07)  0%, transparent 50%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(168,85,247,.04) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  /* subtle hex grid */
+  body::after {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpolygon points='30,2 58,16 58,36 30,50 2,36 2,16' fill='none' stroke='rgba(168,85,247,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 60px 52px;
+    pointer-events:none;
+  }
+
+  #app { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:24px 16px 60px; }
+
+  /* HEADER */
+  .header { text-align:center; padding:40px 0 32px; }
+  .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(168,85,247,.12); border:1px solid rgba(168,85,247,.3);
+    color:var(--accent); font-family:'JetBrains Mono',monospace;
+    font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    padding:5px 14px; border-radius:100px; margin-bottom:16px;
+  }
+  .header h1 {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(1.8rem,5vw,2.6rem); font-weight:700; line-height:1.15;
+    background:linear-gradient(135deg,#fff 20%,var(--accent) 60%,var(--accent2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    margin-bottom:10px;
+  }
+  .header p { color:var(--muted); font-size:.92rem; font-weight:400; }
+
+  /* SYMBOL STRIP */
+  .symbol-strip {
+    display:flex; justify-content:center; gap:14px; margin-bottom:28px; flex-wrap:wrap;
+  }
+  .sym-pill {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:8px 14px; font-family:'JetBrains Mono',monospace; font-size:.95rem;
+    display:flex; align-items:center; gap:8px;
+  }
+  .sym-pill .sym { color:var(--accent); font-weight:700; font-size:1.15rem; }
+  .sym-pill .sym-name { color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; }
+
+  /* TABS */
+  .tabs {
+    display:flex; gap:8px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:6px; margin-bottom:24px;
+  }
+  .tab-btn {
+    flex:1; background:transparent; border:none; color:var(--muted);
+    font-family:'Space Grotesk',sans-serif; font-size:.82rem; font-weight:600;
+    padding:10px 8px; border-radius:9px; cursor:pointer; transition:all .2s; letter-spacing:.03em;
+  }
+  .tab-btn:hover { color:var(--text); background:var(--border); }
+  .tab-btn.active { background:var(--accent); color:#fff; box-shadow:var(--glow); }
+
+  /* CARD */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:32px; margin-bottom:20px;
+    animation:fadeUp .4s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FORM */
+  .form-group { margin-bottom:18px; }
+  .form-group label { display:block; font-size:.75rem; font-weight:600; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:7px; }
+  .form-group input {
+    width:100%; background:var(--surface); border:1.5px solid var(--border);
+    border-radius:9px; color:var(--text); font-family:'Space Grotesk',sans-serif;
+    font-size:.98rem; padding:12px 16px; outline:none; transition:border-color .2s,box-shadow .2s;
+  }
+  .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(168,85,247,.12); }
+  .form-group input::placeholder { color:var(--muted); }
+
+  /* BTN */
+  .btn {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--accent); color:#fff; border:none; border-radius:9px;
+    font-family:'Space Grotesk',sans-serif; font-size:.92rem; font-weight:700;
+    padding:13px 26px; cursor:pointer; transition:transform .15s,box-shadow .2s; letter-spacing:.03em;
+  }
+  .btn:hover { transform:translateY(-2px); box-shadow:var(--glow); }
+  .btn:active { transform:translateY(0); }
+  .btn-full { width:100%; justify-content:center; }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); box-shadow:none; }
+  .btn-cyan { background:var(--accent2); color:#0d0a1a; }
+  .btn-gold { background:var(--gold); color:#111; }
+
+  /* XP */
+  .xp-row {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+    padding:12px 18px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  }
+  .xp-val { font-family:'JetBrains Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--gold); margin-left:auto; }
+  .xp-label { font-size:.78rem; color:var(--muted); }
+
+  /* STREAK */
+  .streak-row { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .streak-star { font-size:1.4rem; filter:grayscale(1) opacity(.3); transition:filter .4s,transform .4s; }
+  .streak-star.lit { filter:none; transform:scale(1.2); }
+
+  /* DOTS */
+  .levels-row { display:flex; gap:10px; justify-content:center; margin-bottom:28px; }
+  .level-dot {
+    width:38px; height:38px; border-radius:50%; border:2px solid var(--border);
+    background:var(--surface); display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:700;
+    color:var(--muted); transition:all .3s;
+  }
+  .level-dot.done   { border-color:var(--green); background:rgba(52,211,153,.1); color:var(--green); }
+  .level-dot.active { border-color:var(--accent); background:rgba(168,85,247,.15); color:var(--accent); box-shadow:0 0 16px rgba(168,85,247,.4); transform:scale(1.1); }
+
+  /* PROGRESS */
+  .progress-wrap { background:var(--surface); border:1px solid var(--border); border-radius:100px; height:8px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:100px; transition:width .6s cubic-bezier(.4,0,.2,1); }
+  .progress-label { display:flex; justify-content:space-between; font-size:.75rem; color:var(--muted); margin-bottom:28px; }
+
+  /* TIMER */
+  .timer-wrap { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+  .timer-bar-bg { flex:1; height:6px; background:var(--border); border-radius:100px; overflow:hidden; }
+  .timer-bar-fill { height:100%; background:var(--gold); border-radius:100px; transition:width .9s linear,background .3s; }
+  .timer-bar-fill.danger { background:var(--red); }
+  .timer-num { font-family:'JetBrains Mono',monospace; font-size:.88rem; font-weight:700; color:var(--gold); min-width:28px; text-align:right; }
+  .timer-num.danger { color:var(--red); }
+
+  /* Q COMMON */
+  .q-level-tag { font-family:'JetBrains Mono',monospace; font-size:.68rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+  .q-stem { font-size:1.04rem; font-weight:400; line-height:1.68; margin-bottom:22px; color:var(--text); }
+  .q-stem strong { color:var(--gold); font-weight:600; }
+  .q-stem em { color:var(--accent2); font-style:normal; }
+  .mono { font-family:'JetBrains Mono',monospace; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:.88em; color:var(--accent); }
+
+  /* MCQ OPTIONS */
+  .options { display:grid; gap:10px; }
+  .opt-btn {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+    color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:.92rem;
+    padding:13px 16px; text-align:left; cursor:pointer; transition:all .2s;
+    display:flex; align-items:flex-start; gap:12px;
+  }
+  .opt-btn:hover:not(:disabled) { border-color:var(--accent); background:rgba(168,85,247,.07); transform:translateX(4px); }
+  .opt-letter { min-width:26px; height:26px; border-radius:6px; background:var(--border); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:700; color:var(--muted); flex-shrink:0; }
+  .opt-btn.correct { border-color:var(--green); background:rgba(52,211,153,.08); }
+  .opt-btn.correct .opt-letter { background:var(--green); color:#0d0a1a; }
+  .opt-btn.wrong   { border-color:var(--red);   background:rgba(248,113,113,.07); opacity:.7; }
+  .opt-btn.wrong   .opt-letter { background:var(--red); color:#fff; }
+  .opt-btn:disabled { pointer-events:none; }
+
+  /* TF */
+  .tf-row { display:flex; gap:12px; }
+  .tf-chip {
+    flex:1; padding:16px; border-radius:10px; border:1.5px solid var(--border);
+    background:var(--surface); color:var(--text); font-family:'Space Grotesk',sans-serif;
+    font-size:1rem; font-weight:700; cursor:pointer; text-align:center;
+    transition:all .2s; letter-spacing:.03em;
+  }
+  .tf-chip:hover:not(:disabled) { border-color:var(--accent); background:rgba(168,85,247,.08); }
+  .tf-chip.correct-chip { border-color:var(--green); background:rgba(52,211,153,.1); color:var(--green); }
+  .tf-chip.wrong-chip   { border-color:var(--red);   background:rgba(248,113,113,.07); opacity:.65; }
+  .tf-chip:disabled { pointer-events:none; }
+
+  /* FORMULA BUILDER — nivel 3 */
+  .formula-builder { margin-bottom:14px; }
+  .formula-display {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+    padding:16px 18px; font-family:'JetBrains Mono',monospace; font-size:1.3rem;
+    font-weight:700; color:var(--accent2); min-height:58px; letter-spacing:.08em;
+    display:flex; align-items:center; gap:4px; flex-wrap:wrap; margin-bottom:14px;
+    cursor:pointer; transition:border-color .2s;
+  }
+  .formula-display:hover { border-color:var(--border); }
+  .formula-display .f-token { padding:2px 4px; border-radius:4px; transition:background .15s; }
+  .formula-display .f-token:hover { background:rgba(248,113,113,.15); }
+  .formula-display .placeholder { color:var(--muted); font-size:.85rem; font-weight:400; letter-spacing:.04em; }
+  .token-palette { display:flex; gap:8px; flex-wrap:wrap; }
+  .token-btn {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'JetBrains Mono',monospace; font-size:1rem; font-weight:600;
+    padding:10px 14px; cursor:pointer; transition:all .15s;
+  }
+  .token-btn:hover { border-color:var(--accent); background:rgba(168,85,247,.08); color:var(--accent); transform:translateY(-2px); }
+  .token-btn:disabled { opacity:.35; pointer-events:none; }
+  .formula-actions { display:flex; gap:8px; margin-top:10px; }
+  .btn-sm {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:8px;
+    color:var(--muted); font-family:'Space Grotesk',sans-serif; font-size:.8rem; font-weight:600;
+    padding:7px 14px; cursor:pointer; transition:all .15s;
+  }
+  .btn-sm:hover { border-color:var(--red); color:var(--red); }
+
+  /* DRAG-ORDER — nivel 4 */
+  .drag-list { display:grid; gap:8px; margin-bottom:14px; }
+  .drag-item {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+    padding:13px 16px; cursor:grab; display:flex; align-items:center; gap:12px;
+    font-size:.92rem; transition:border-color .2s,transform .15s; user-select:none;
+  }
+  .drag-item:active { cursor:grabbing; }
+  .drag-item.dragging { opacity:.45; transform:scale(.97); }
+  .drag-item.drag-over { border-color:var(--accent); background:rgba(168,85,247,.08); }
+  .drag-handle { color:var(--muted); font-size:1rem; flex-shrink:0; }
+  .drag-item .step-num { font-family:'JetBrains Mono',monospace; font-size:.75rem; color:var(--accent); min-width:20px; }
+
+  /* HOTSPOT — nivel 5 */
+  .hotspot-sentence {
+    font-size:1.08rem; line-height:2.4; background:var(--surface);
+    border:1px solid var(--border); border-radius:10px; padding:18px 20px; margin-bottom:14px;
+  }
+  .hotspot-word {
+    display:inline-block; padding:2px 6px; border-radius:6px; cursor:pointer;
+    transition:all .2s; border:1.5px solid transparent; font-family:'JetBrains Mono',monospace;
+    font-weight:600; letter-spacing:.04em;
+  }
+  .hotspot-word:hover:not(.answered) { border-color:var(--accent); background:rgba(168,85,247,.12); color:var(--accent); }
+  .hotspot-word.selected { border-color:var(--gold); background:rgba(251,191,36,.1); color:var(--gold); }
+  .hotspot-word.correct-hs { border-color:var(--green); background:rgba(52,211,153,.12); color:var(--green); pointer-events:none; }
+  .hotspot-word.wrong-hs   { border-color:var(--red);   background:rgba(248,113,113,.1); color:var(--red); pointer-events:none; }
+  .hotspot-word.answered   { pointer-events:none; }
+
+  /* TRANSLATE — nivel 6 */
+  .translate-box {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; font-style:italic; font-size:1.02rem; line-height:1.7;
+    margin-bottom:18px; color:var(--accent2); border-left:3px solid var(--accent2);
+  }
+  .answer-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .answer-chip {
+    background:var(--surface); border:1.5px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'JetBrains Mono',monospace; font-size:.9rem;
+    padding:8px 14px; cursor:pointer; transition:all .18s;
+  }
+  .answer-chip:hover:not(:disabled):not(.used) { border-color:var(--accent); color:var(--accent); background:rgba(168,85,247,.08); }
+  .answer-chip.used { opacity:.3; pointer-events:none; }
+  .answer-chip.correct-chip2 { border-color:var(--green); color:var(--green); background:rgba(52,211,153,.1); pointer-events:none; }
+  .answer-chip.wrong-chip2   { border-color:var(--red);   color:var(--red);   background:rgba(248,113,113,.08); }
+
+  /* FEEDBACK */
+  .feedback { margin-top:16px; padding:14px 18px; border-radius:10px; font-size:.9rem; line-height:1.6; display:none; animation:fadeUp .3s ease; }
+  .feedback.show { display:block; }
+  .feedback.ok  { background:rgba(52,211,153,.09);  border:1px solid rgba(52,211,153,.25);  color:var(--green); }
+  .feedback.err { background:rgba(248,113,113,.07); border:1px solid rgba(248,113,113,.2);  color:var(--red); }
+
+  /* SECTION TITLE */
+  .section-title { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* RESULT */
+  .result-trophy { font-size:4rem; text-align:center; margin:10px 0 16px; }
+  .result-title  { font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; text-align:center; margin-bottom:8px; }
+  .result-sub    { text-align:center; color:var(--muted); margin-bottom:24px; font-size:.92rem; }
+  .result-stats  { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:28px; }
+  .stat-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 12px; text-align:center; }
+  .stat-box .sv { font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:700; color:var(--accent); }
+  .stat-box .sl { font-size:.75rem; color:var(--muted); margin-top:4px; }
+
+  .spinner { display:inline-block; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .hidden { display:none !important; }
+  .toast { position:fixed; bottom:24px; right:24px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 20px; font-size:.88rem; z-index:9999; animation:slideIn .3s ease; max-width:300px; }
+  .toast.ok  { border-color:var(--green); }
+  .toast.err { border-color:var(--red); }
+  @keyframes slideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+
+  @media(max-width:500px){
+    .card{padding:22px 18px;} .result-stats{grid-template-columns:1fr 1fr;}
+    .tab-btn{font-size:.72rem;padding:9px 4px;}
+    .symbol-strip{gap:8px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="header">
+    <div class="badge">⬡ Pensamiento Crítico · UVP · Semana 3</div>
+    <h1>Conectivas Lógicas<br>y Formalización</h1>
+    <p>¬ ∧ ∨ → ↔ · 6 niveles · Construye fórmulas · Gana XP</p>
+  </div>
+
+  <!-- Cheat-sheet de conectivas -->
+  <div class="symbol-strip">
+    <div class="sym-pill"><span class="sym">¬</span><span class="sym-name">Negación</span></div>
+    <div class="sym-pill"><span class="sym">∧</span><span class="sym-name">Conjunción</span></div>
+    <div class="sym-pill"><span class="sym">∨</span><span class="sym-name">Disyunción</span></div>
+    <div class="sym-pill"><span class="sym">→</span><span class="sym-name">Condicional</span></div>
+    <div class="sym-pill"><span class="sym">↔</span><span class="sym-name">Bicondicional</span></div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs" id="plantel-tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-nombre" placeholder="Ej. Ana Torres Vega" autocomplete="name"/>
+    </div>
+    <div class="form-group">
+      <label>Matrícula</label>
+      <input type="text" id="inp-matricula" placeholder="Ej. 2023001234"
+             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/>
+    </div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="hidden">
+    <div class="xp-row">
+      <span style="font-size:1.3rem">⚡</span>
+      <div class="xp-label">XP acumulados</div>
+      <div class="xp-val" id="xp-display">0 XP</div>
+    </div>
+    <div class="streak-row">
+      <span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span>
+      <span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span>
+      <span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span>
+    </div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap">
+        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+        <div class="timer-num" id="timer-num">30</div>
+      </div>
+      <div class="q-level-tag" id="q-level-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title"  id="result-title">¡Completado!</div>
+    <div class="result-sub"    id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()">
+      <span id="save-label">Guardar resultado</span>
+    </button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+// ══════════════════════════════════════════════════════════
+// NIVELES
+// ══════════════════════════════════════════════════════════
+const LEVELS = [
+
+  /* ── L1 · MCQ: identificar conectiva ─────────────────── */
+  {
+    id:1, tag:"Nivel 1 — Identifica la conectiva", xp:50, time:28, type:"mcq",
+    stem:"El titular de un periódico dice: <em>«Si el gobierno aprueba el presupuesto, entonces habrá nuevas obras.»</em><br><br>¿Qué conectiva lógica representa mejor la estructura de este enunciado?",
+    opts:[
+      "Conjunción  ∧  (y)",
+      "Disyunción  ∨  (o)",
+      "Condicional  →  (si… entonces)",
+      "Bicondicional  ↔  (si y solo si)"
+    ],
+    correct:2,
+    fb_ok:"✅ Correcto. La estructura «Si P entonces Q» es el condicional →. El antecedente (P) es la condición; el consecuente (Q) es la consecuencia.",
+    fb_err:"La clave es la estructura «Si… entonces…». Eso define al condicional →, no a una conjunción ni disyunción."
+  },
+
+  /* ── L2 · TF: propiedad del bicondicional ────────────── */
+  {
+    id:2, tag:"Nivel 2 — Verdadero o Falso", xp:75, time:25, type:"tf",
+    stem:"Afirmación: <em>«El bicondicional <span class='mono'>p ↔ q</span> es verdadero únicamente cuando p y q tienen el <strong>mismo valor de verdad</strong> (ambos verdaderos o ambos falsos).»</em>",
+    correct:true,
+    fb_ok:"✅ Verdadero. El bicondicional equivale a decir «p si y solo si q»: se sostiene exactamente cuando ambos lados coinciden en valor.",
+    fb_err:"Es Verdadero. El bicondicional es verdadero solo cuando p y q comparten valor de verdad (VV o FF). En cualquier otro caso es falso."
+  },
+
+  /* ── L3 · Constructor de fórmula ─────────────────────── */
+  {
+    id:3, tag:"Nivel 3 — Construye la fórmula", xp:100, time:40, type:"builder",
+    stem:"Formaliza el siguiente enunciado usando los tokens disponibles:<br><br><span style='font-style:italic;color:var(--accent2)'>«Llueve y no hace calor.»</span><br><br><span style='font-size:.82rem;color:var(--muted)'>Sea <strong>p</strong> = «Llueve» y <strong>q</strong> = «Hace calor».</span>",
+    tokens:["p","q","¬","∧","∨","→","↔","(",")" ],
+    answer:"p∧¬q",
+    altAnswers:["p ∧ ¬q","(p∧¬q)","(p ∧ ¬q)"],
+    fb_ok:"✅ ¡Perfecto! <span class='mono'>p ∧ ¬q</span> captura exactamente «Llueve (p) Y (∧) NO hace calor (¬q)».",
+    fb_err:"La respuesta correcta es <span class='mono'>p ∧ ¬q</span>. «Y» se traduce como ∧; «no hace calor» es ¬q."
+  },
+
+  /* ── L4 · Ordenar pasos de traducción ────────────────── */
+  {
+    id:4, tag:"Nivel 4 — Ordena los pasos", xp:125, time:38, type:"order",
+    stem:"Para formalizar el enunciado <em>«Si estudio, entonces apruebo o festejo»</em>, un estudiante identificó los pasos correctos pero los desordenó. <strong>Ordénalos del 1 al 4</strong> arrastrando.",
+    items:[
+      { text:'Identificar variables: p = «Estudio», q = «Apruebo», r = «Festejo»',  order:1 },
+      { text:'Detectar la conectiva principal: «Si… entonces» → condicional →',      order:2 },
+      { text:'Formalizar el consecuente: «apruebo O festejo» = q ∨ r',              order:3 },
+      { text:'Escribir la fórmula completa: p → (q ∨ r)',                           order:4 },
+    ],
+    fb_ok:"✅ ¡Orden correcto! Siempre se empieza por las variables, luego la conectiva principal, luego las subpartes y finalmente la fórmula completa.",
+    fb_err:"El orden correcto es: 1) identificar variables, 2) detectar conectiva principal, 3) formalizar subpartes, 4) escribir la fórmula total."
+  },
+
+  /* ── L5 · Hotspot: identifica la conectiva en texto ──── */
+  {
+    id:5, tag:"Nivel 5 — Toca la conectiva", xp:150, time:30, type:"hotspot",
+    stem:"En el siguiente titular, <strong>toca / haz clic</strong> en la palabra o frase que funciona como <em>disyunción lógica</em> (∨):",
+    sentence:"El candidato ganará la elección si obtiene mayoría o si llega a un acuerdo con los partidos minoritarios .",
+    // words to mark as clickable
+    targets:["o"],   // correct word(s) to click
+    fb_ok:"✅ Exacto. «O» es la disyunción ∨. Conecta dos proposiciones posibles alternativas.",
+    fb_err:"La disyunción es «o». Palabras como «si» y «si…entonces» indican condicional, no disyunción."
+  },
+
+  /* ── L6 · Traduce titular a fórmula (chips) ──────────── */
+  {
+    id:6, tag:"Nivel 6 — Formaliza un titular", xp:200, time:35, type:"translate",
+    stem:"Formaliza completamente el siguiente titular periodístico usando los chips de abajo:",
+    sentence:"«La reforma pasa si y solo si hay consenso y no hay veto presidencial.»",
+    hint:"Sea: p = «La reforma pasa», q = «Hay consenso», r = «Hay veto presidencial»",
+    chips:["p","↔","q","∧","¬r","→","∨","¬q","r","(q ∧ ¬r)"],
+    answer:["p","↔","(q ∧ ¬r)"],
+    fb_ok:"✅ Excelente. <span class='mono'>p ↔ (q ∧ ¬r)</span>: «La reforma pasa SI Y SOLO SI (↔) hay consenso (q) Y (∧) NO hay veto (¬r)».",
+    fb_err:"Respuesta: <span class='mono'>p ↔ (q ∧ ¬r)</span>. «Si y solo si» = bicondicional ↔. El consecuente necesita paréntesis porque agrupa q ∧ ¬r."
+  }
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let S = {
+  plantel:"Puebla", nombre:"", matricula:"",
+  cur:0, xp:0, correct:0, startTime:null,
+  timer:null, timeLeft:30, answered:false, _tt:0,
+  builderTokens:[],
+  orderDragged:null,
+  translateSelected:[]
+};
+
+// ══════════════════════════════════════════════════════════
+// PLANTEL
+// ══════════════════════════════════════════════════════════
+function selectPlantel(b){
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); S.plantel=b.dataset.plantel;
+}
+
+// ══════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim();
+  const m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return;}
+  if(m.length<5){showToast("Matrícula inválida","err");return;}
+  S.nombre=n; S.matricula=m; S.cur=0; S.xp=0; S.correct=0; S.startTime=Date.now();
+  show('screen-game'); hide('screen-login');
+  buildDots(); loadLevel();
+}
+
+function buildDots(){
+  const r=document.getElementById('levels-row'); r.innerHTML='';
+  LEVELS.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='level-dot'+(i===0?' active':''); d.id='dot-'+i; d.textContent=i+1; r.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// LOAD LEVEL
+// ══════════════════════════════════════════════════════════
+function loadLevel(){
+  const lvl=LEVELS[S.cur];
+  S.answered=false; S.builderTokens=[]; S.orderDragged=null; S.translateSelected=[];
+
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{
+    d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');
+    d.textContent=i<S.cur?'✓':i+1;
+  });
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-level-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback'); fb.className='feedback'; fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+
+  const body=document.getElementById('q-body'); body.innerHTML='';
+  const r = {mcq:renderMCQ, tf:renderTF, builder:renderBuilder, order:renderOrder, hotspot:renderHotspot, translate:renderTranslate};
+  r[lvl.type](lvl, body);
+  startTimer(lvl.time);
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER TYPES
+// ══════════════════════════════════════════════════════════
+
+/* MCQ */
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  const L=['A','B','C','D'];
+  lvl.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';
+    b.innerHTML=`<span class="opt-letter">${L[i]}</span><span>${o}</span>`;
+    b.onclick=()=>answerMCQ(i,lvl);
+    body.querySelector('#opts').appendChild(b);
+  });
+}
+function answerMCQ(idx,lvl){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===lvl.correct) b.classList.add('correct');
+    else if(i===idx) b.classList.add('wrong');
+  });
+  if(idx===lvl.correct) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* TF */
+function renderTF(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="tf-row">
+    <button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Verdadero</button>
+    <button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Falso</button>
+  </div>`;
+}
+function answerTF(val){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'), bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;
+  const chosen=val?bt:bf;
+  chosen.classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* BUILDER */
+function renderBuilder(lvl,body){
+  body.innerHTML=`
+    <div class="q-stem">${lvl.stem}</div>
+    <div class="formula-builder">
+      <div class="formula-display" id="formula-display" onclick="removeLastToken()">
+        <span class="placeholder" id="f-placeholder">Tu fórmula aparecerá aquí… (clic para borrar)</span>
+      </div>
+      <div class="token-palette" id="token-palette"></div>
+      <div class="formula-actions">
+        <button class="btn-sm" onclick="clearFormula()">✕ Limpiar</button>
+        <button class="btn-sm" style="margin-left:auto;border-color:var(--accent);color:var(--accent)" onclick="checkBuilder()">Verificar ✓</button>
+      </div>
+    </div>`;
+  const palette=body.querySelector('#token-palette');
+  lvl.tokens.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='token-btn'; b.textContent=t;
+    b.onclick=()=>addToken(t);
+    palette.appendChild(b);
+  });
+}
+function addToken(t){
+  if(S.answered) return;
+  S.builderTokens.push(t);
+  renderFormula();
+}
+function removeLastToken(){
+  if(S.answered) return;
+  S.builderTokens.pop();
+  renderFormula();
+}
+function clearFormula(){
+  if(S.answered) return;
+  S.builderTokens=[];
+  renderFormula();
+}
+function renderFormula(){
+  const d=document.getElementById('formula-display');
+  const ph=document.getElementById('f-placeholder');
+  if(S.builderTokens.length===0){
+    d.innerHTML='<span class="placeholder" id="f-placeholder">Tu fórmula aparecerá aquí… (clic para borrar)</span>';
+    return;
+  }
+  d.innerHTML=S.builderTokens.map(t=>`<span class="f-token">${t}</span>`).join('');
+}
+function checkBuilder(){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const built=S.builderTokens.join('').replace(/\s/g,'');
+  const correct=lvl.answer.replace(/\s/g,'');
+  const alts=(lvl.altAnswers||[]).map(a=>a.replace(/\s/g,''));
+  const ok=built===correct||alts.includes(built);
+  if(ok) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+  document.querySelectorAll('.token-btn').forEach(b=>b.disabled=true);
+}
+
+/* ORDER */
+function renderOrder(lvl,body){
+  // shuffle
+  const shuffled=[...lvl.items].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="drag-list" id="drag-list"></div>
+  <button class="btn btn-full btn-cyan" id="btn-check-order" onclick="checkOrder()" style="margin-top:4px">Verificar orden ✓</button>`;
+  const list=body.querySelector('#drag-list');
+  shuffled.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='drag-item'; d.dataset.order=item.order; d.draggable=true;
+    d.innerHTML=`<span class="drag-handle">⠿</span><span class="step-num">#${i+1}</span><span>${item.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDragged=d; d.classList.add('dragging'); e.dataTransfer.effectAllowed='move';});
+    d.addEventListener('dragend',()=>{ d.classList.remove('dragging'); S.orderDragged=null; });
+    d.addEventListener('dragover',e=>{ e.preventDefault(); d.classList.add('drag-over'); });
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over'));
+    d.addEventListener('drop',e=>{
+      e.preventDefault(); d.classList.remove('drag-over');
+      if(S.orderDragged&&S.orderDragged!==d){
+        const items=[...list.children];
+        const idxA=items.indexOf(S.orderDragged), idxB=items.indexOf(d);
+        if(idxA<idxB) list.insertBefore(S.orderDragged,d.nextSibling);
+        else list.insertBefore(S.orderDragged,d);
+        // update step nums
+        [...list.children].forEach((el,i)=>el.querySelector('.step-num').textContent='#'+(i+1));
+      }
+    });
+    list.appendChild(d);
+  });
+}
+function checkOrder(){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const list=document.getElementById('drag-list');
+  const items=[...list.children];
+  let ok=true;
+  items.forEach((el,i)=>{
+    const expected=i+1;
+    const actual=parseInt(el.dataset.order);
+    if(actual!==expected){
+      ok=false;
+      el.style.borderColor='var(--red)'; el.style.background='rgba(248,113,113,.07)';
+    } else {
+      el.style.borderColor='var(--green)'; el.style.background='rgba(52,211,153,.08)';
+    }
+  });
+  document.getElementById('btn-check-order').disabled=true;
+  if(ok) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* HOTSPOT */
+function renderHotspot(lvl,body){
+  const words=lvl.sentence.split(' ');
+  const clickable=lvl.targets.map(t=>t.toLowerCase());
+  const ws=words.map((w,i)=>{
+    const clean=w.replace(/[.,;:!?]/g,'').toLowerCase();
+    const isTarget=clickable.includes(clean);
+    if(isTarget) return `<span class="hotspot-word" data-target="1" data-idx="${i}" onclick="answerHotspot(this)">${w}</span>`;
+    // some decoy words also clickable but wrong
+    const decoys=['si','entonces','y','no','con'];
+    if(decoys.includes(clean)) return `<span class="hotspot-word" data-target="0" data-idx="${i}" onclick="answerHotspot(this)">${w}</span>`;
+    return `<span>${w}</span>`;
+  }).join(' ');
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="hotspot-sentence">${ws}</div>`;
+}
+function answerHotspot(el){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const ok=el.dataset.target==='1';
+  document.querySelectorAll('.hotspot-word').forEach(w=>w.classList.add('answered'));
+  el.classList.add(ok?'correct-hs':'wrong-hs');
+  // also highlight all correct ones
+  document.querySelectorAll('.hotspot-word[data-target="1"]').forEach(w=>{ if(!w.classList.contains('wrong-hs')) w.classList.add('correct-hs'); });
+  if(ok) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* TRANSLATE */
+function renderTranslate(lvl,body){
+  body.innerHTML=`
+    <div class="q-stem">${lvl.stem}</div>
+    <div class="translate-box">${lvl.sentence}</div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">💡 ${lvl.hint}</p>
+    <div id="answer-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;min-height:52px;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--accent2)">
+      <span id="ans-placeholder" style="color:var(--muted);font-size:.85rem">Selecciona los chips en orden…</span>
+    </div>
+    <div class="answer-chips" id="chips"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn-sm" onclick="clearTranslate()">✕ Limpiar</button>
+      <button class="btn-sm" style="margin-left:auto;border-color:var(--accent);color:var(--accent)" onclick="checkTranslate()">Verificar ✓</button>
+    </div>`;
+  const container=body.querySelector('#chips');
+  lvl.chips.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='answer-chip'; b.textContent=c; b.dataset.chip=c; b.dataset.ci=i;
+    b.onclick=()=>selectChip(b,c);
+    container.appendChild(b);
+  });
+}
+function selectChip(btn,val){
+  if(S.answered) return;
+  if(btn.classList.contains('used')) return;
+  S.translateSelected.push({val,btn});
+  btn.classList.add('used');
+  const row=document.getElementById('answer-row');
+  const ph=document.getElementById('ans-placeholder');
+  if(ph) ph.remove();
+  const span=document.createElement('span');
+  span.textContent=val; span.style.marginRight='4px';
+  row.appendChild(span);
+}
+function clearTranslate(){
+  if(S.answered) return;
+  S.translateSelected=[];
+  document.querySelectorAll('.answer-chip').forEach(b=>b.classList.remove('used'));
+  const row=document.getElementById('answer-row');
+  row.innerHTML='<span id="ans-placeholder" style="color:var(--muted);font-size:.85rem">Selecciona los chips en orden…</span>';
+}
+function checkTranslate(){
+  if(S.answered) return;
+  S.answered=true; clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const sel=S.translateSelected.map(x=>x.val.replace(/\s/g,''));
+  const ans=lvl.answer.map(a=>a.replace(/\s/g,''));
+  const ok=JSON.stringify(sel)===JSON.stringify(ans);
+  // mark chips
+  S.translateSelected.forEach((x,i)=>{
+    x.btn.classList.remove('used');
+    x.btn.classList.add(ok&&i<ans.length?'correct-chip2':'wrong-chip2');
+  });
+  if(ok) earnXP(lvl); else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════════════════
+function startTimer(seconds){
+  clearInterval(S.timer); S.timeLeft=seconds;
+  const bar=document.getElementById('timer-bar'), num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill'; num.className='timer-num';
+  bar.style.width='100%'; num.textContent=seconds;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;
+    bar.style.width=(S.timeLeft/seconds*100)+'%';
+    num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){ bar.className='timer-bar-fill danger'; num.className='timer-num danger'; }
+    if(S.timeLeft<=0){ clearInterval(S.timer); if(!S.answered) timeOut(); }
+  },1000);
+}
+function timeOut(){
+  if(S.answered) return;
+  S.answered=true;
+  const lvl=LEVELS[S.cur];
+  ['btn-check-order','btn-check-builder'].forEach(id=>{ const e=document.getElementById(id); if(e) e.disabled=true; });
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{ b.disabled=true; if(i===lvl.correct) b.classList.add('correct'); });
+  document.querySelectorAll('.hotspot-word').forEach(w=>w.classList.add('answered'));
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════════════════════
+// XP + FEEDBACK
+// ══════════════════════════════════════════════════════════
+function earnXP(lvl){
+  const bonus=Math.round((S.timeLeft/lvl.time)*50);
+  S.xp+=lvl.xp+bonus; S.correct+=1;
+  document.getElementById('st'+S.cur).classList.add('lit');
+  document.getElementById('xp-display').textContent=S.xp+' XP';
+  showFeedback(true,lvl.fb_ok+(bonus?` <em>+${bonus} XP bonus ⚡</em>`:''));
+}
+function showFeedback(ok,msg){
+  const fb=document.getElementById('feedback');
+  fb.className='feedback show '+(ok?'ok':'err');
+  fb.innerHTML=msg;
+}
+
+// ══════════════════════════════════════════════════════════
+// NEXT / RESULT
+// ══════════════════════════════════════════════════════════
+function nextLevel(){
+  S.cur++;
+  if(S.cur>=LEVELS.length) showResult(); else loadLevel();
+}
+function showResult(){
+  hide('screen-game'); show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000); S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='¡Actividad completada!',sub='Repasa las conectivas y vuelve a intentar.';
+  if(pct>=83){trophy='🏆';title='¡Dominio sólido!';sub='Las conectivas lógicas son tuyas. Adelante con la Semana 4.';}
+  else if(pct>=60){trophy='🥈';title='¡Buen intento!';sub='Repasa los símbolos que te costaron más trabajo.';}
+  document.getElementById('result-trophy').textContent=trophy;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;
+  document.getElementById('r-xp').textContent=S.xp;
+  document.getElementById('r-time').textContent=tt+'s';
+}
+
+// ══════════════════════════════════════════════════════════
+// SAVE
+// ══════════════════════════════════════════════════════════
+async function saveResult(){
+  const btn=document.getElementById('btn-save'), lbl=document.getElementById('save-label');
+  btn.disabled=true; lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const payload={
+    plantel:S.plantel, matricula:S.matricula, nombre:S.nombre,
+    semana:3, tema:"Conectivas Lógicas y Formalización",
+    correctas:S.correct, total:LEVELS.length,
+    xp:S.xp, porcentaje:Math.round((S.correct/LEVELS.length)*100),
+    tiempoTotal:S._tt,
+    fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})
+  };
+  try{
+    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    showToast('✅ Resultado guardado','ok'); lbl.textContent='✓ Guardado';
+  }catch(e){
+    showToast('❌ Error al guardar','err'); btn.disabled=false; lbl.textContent='Reintentar';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// RESET + UTILS
+// ══════════════════════════════════════════════════════════
+function resetAll(){
+  hide('screen-result'); hide('screen-game'); show('screen-login');
+  for(let i=0;i<6;i++) document.getElementById('st'+i).classList.remove('lit');
+  document.getElementById('xp-display').textContent='0 XP';
+}
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+function showToast(msg,type){
+  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+</script>
+</body>
+</html>
