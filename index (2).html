@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pensamiento Crítico · UVP · Actividades Gamificadas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080f;--surface:#0f1120;--card:#141828;--border:#1e2540;
+    --a1:#4f8ef7;--a2:#e05c8a;--gold:#f5c842;--green:#3dd68c;
+    --text:#e8eaf2;--muted:#4a5370;--radius:12px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(79,142,247,.08) 0%,transparent 55%),
+               radial-gradient(ellipse 50% 40% at 90% 90%,rgba(224,92,138,.06) 0%,transparent 50%);
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:32px 16px 60px}
+
+  /* HEADER */
+  .hero{text-align:center;padding:50px 0 40px}
+  .hero .school{display:inline-flex;align-items:center;gap:8px;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);color:var(--a1);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:18px}
+  .hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;line-height:1.1;margin-bottom:14px;
+    background:linear-gradient(135deg,#fff 20%,var(--a1) 55%,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero p{color:var(--muted);font-size:1rem;max-width:520px;margin:0 auto 28px;line-height:1.65}
+  .stats-row{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}
+  .stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 20px;font-size:.85rem;font-weight:500;color:var(--muted)}
+  .stat-pill span{color:var(--text);font-weight:700;font-family:'Syne',sans-serif}
+
+  /* MODULES */
+  .module-section{margin-bottom:36px}
+  .module-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .module-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:800;flex-shrink:0}
+  .module-num.m1{background:rgba(79,142,247,.15);border:1.5px solid rgba(79,142,247,.35);color:var(--a1)}
+  .module-num.m2{background:rgba(224,92,138,.12);border:1.5px solid rgba(224,92,138,.3);color:var(--a2)}
+  .module-num.m3{background:rgba(245,200,66,.1);border:1.5px solid rgba(245,200,66,.3);color:var(--gold)}
+  .module-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+  .module-title small{display:block;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:400;color:var(--muted);margin-top:2px}
+  .module-divider{flex:1;height:1px;background:var(--border)}
+
+  /* WEEK GRID */
+  .weeks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .week-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;text-decoration:none;color:var(--text);transition:all .22s;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+  .week-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--card-accent,rgba(79,142,247,.05)) 0%,transparent 60%);opacity:0;transition:opacity .22s}
+  .week-card:hover{border-color:var(--card-color,var(--a1));transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+  .week-card:hover::before{opacity:1}
+  .week-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .week-info .week-num{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+  .week-info .week-title{font-size:.88rem;font-weight:500;line-height:1.35}
+  .week-info .week-badge{display:inline-block;font-size:.65rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;margin-top:5px}
+
+  /* Module colors */
+  .m1-card{--card-color:#4f8ef7;--card-accent:rgba(79,142,247,.05)}
+  .m1-card .week-icon{background:rgba(79,142,247,.12)}
+  .m1-card .week-num{color:var(--a1)}
+  .m1-card .week-badge{background:rgba(79,142,247,.12);color:var(--a1)}
+
+  .m2-card{--card-color:#e05c8a;--card-accent:rgba(224,92,138,.05)}
+  .m2-card .week-icon{background:rgba(224,92,138,.1)}
+  .m2-card .week-num{color:var(--a2)}
+  .m2-card .week-badge{background:rgba(224,92,138,.1);color:var(--a2)}
+
+  .m3-card{--card-color:#f5c842;--card-accent:rgba(245,200,66,.05)}
+  .m3-card .week-icon{background:rgba(245,200,66,.1)}
+  .m3-card .week-num{color:var(--gold)}
+  .m3-card .week-badge{background:rgba(245,200,66,.1);color:var(--gold)}
+
+  /* FOOTER */
+  .footer{text-align:center;padding:32px 0 0;border-top:1px solid var(--border);margin-top:8px}
+  .footer p{font-size:.8rem;color:var(--muted);line-height:1.7}
+  .footer strong{color:var(--text)}
+
+  @media(max-width:520px){
+    .hero{padding:36px 0 28px}
+    .weeks-grid{grid-template-columns:1fr}
+    .stats-row{gap:12px}
+    .stat-pill{font-size:.78rem}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="school">🎓 Universidad del Valle de Puebla</div>
+    <h1>Pensamiento Crítico<br>Actividades Gamificadas</h1>
+    <p>16 semanas · 6 niveles por semana · XP, temporizador y registro automático en Google Sheets</p>
+    <div class="stats-row">
+      <div class="stat-pill"><span>16</span> semanas</div>
+      <div class="stat-pill"><span>96</span> niveles</div>
+      <div class="stat-pill"><span>3</span> planteles</div>
+      <div class="stat-pill"><span>1</span> Apps Script</div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 1 -->
+  <div class="module-section">
+    <div class="module-header">
+      <div class="module-num m1">M1</div>
+      <div class="module-title">Herramientas Formales e Introducción a la Lógica
+        <small>Semanas 1 – 6</small>
+      </div>
+      <div class="module-divider"></div>
+    </div>
+    <div class="weeks-grid">
+      <a href="semana1_actividad.html" class="week-card m1-card">
+        <div class="week-icon">📋</div>
+        <div class="week-info">
+          <div class="week-num">Semana 1</div>
+          <div class="week-title">Normativas de Clase</div>
+          <div class="week-badge">Reconocimiento</div>
+        </div>
+      </a>
+      <a href="semana2_actividad.html" class="week-card m1-card">
+        <div class="week-icon">🔤</div>
+        <div class="week-info">
+          <div class="week-num">Semana 2</div>
+          <div class="week-title">Proposición y Lenguaje Simbólico</div>
+          <div class="week-badge">Clasificar · Emparejar</div>
+        </div>
+      </a>
+      <a href="semana3_actividad.html" class="week-card m1-card">
+        <div class="week-icon">⬡</div>
+        <div class="week-info">
+          <div class="week-num">Semana 3</div>
+          <div class="week-title">Conectivas Lógicas y Formalización</div>
+          <div class="week-badge">Constructor · Chips</div>
+        </div>
+      </a>
+      <a href="semana4_actividad.html" class="week-card m1-card">
+        <div class="week-icon">📊</div>
+        <div class="week-info">
+          <div class="week-num">Semana 4</div>
+          <div class="week-title">Tablas de Verdad</div>
+          <div class="week-badge">Tablas interactivas</div>
+        </div>
+      </a>
+      <a href="semana5_actividad.html" class="week-card m1-card">
+        <div class="week-icon">∴</div>
+        <div class="week-info">
+          <div class="week-num">Semana 5</div>
+          <div class="week-title">Reglas de Inferencia</div>
+          <div class="week-badge">Detector de falacias</div>
+        </div>
+      </a>
+      <a href="semana6_actividad.html" class="week-card m1-card">
+        <div class="week-icon">⚖️</div>
+        <div class="week-info">
+          <div class="week-num">Semana 6</div>
+          <div class="week-title">Validez vs. Verdad</div>
+          <div class="week-badge">Clasificar · Ordenar</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MÓDULO 2 -->
+  <div class="module-section">
+    <div class="module-header">
+      <div class="module-num m2">M2</div>
+      <div class="module-title">Análisis del Lenguaje y Lógica Aplicada
+        <small>Semanas 7 – 11</small>
+      </div>
+      <div class="module-divider"></div>
+    </div>
+    <div class="weeks-grid">
+      <a href="semana7_actividad.html" class="week-card m2-card">
+        <div class="week-icon">🔍</div>
+        <div class="week-info">
+          <div class="week-num">Semana 7</div>
+          <div class="week-title">Reconstrucción de Argumentos</div>
+          <div class="week-badge">Hotspot · Ordenar</div>
+        </div>
+      </a>
+      <a href="semana8_actividad.html" class="week-card m2-card">
+        <div class="week-icon">§</div>
+        <div class="week-info">
+          <div class="week-num">Semana 8</div>
+          <div class="week-title">Lógica y Definición</div>
+          <div class="week-badge">Ambigüedad · Vaguedad</div>
+        </div>
+      </a>
+      <a href="semana9_actividad.html" class="week-card m2-card">
+        <div class="week-icon">⚠️</div>
+        <div class="week-info">
+          <div class="week-num">Semana 9</div>
+          <div class="week-title">Falacias Informales y Sesgos</div>
+          <div class="week-badge">Ad Hominem · Paja</div>
+        </div>
+      </a>
+      <a href="semana10_actividad.html" class="week-card m2-card">
+        <div class="week-icon">🔬</div>
+        <div class="week-info">
+          <div class="week-num">Semana 10</div>
+          <div class="week-title">Lógica en las Disciplinas</div>
+          <div class="week-badge">⚙️ ⚖️ 🩺</div>
+        </div>
+      </a>
+      <a href="semana11_actividad.html" class="week-card m2-card">
+        <div class="week-icon">✦</div>
+        <div class="week-info">
+          <div class="week-num">Semana 11</div>
+          <div class="week-title">Pensamiento Hipotético y Abductivo</div>
+          <div class="week-badge">Ranking · Picker</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MÓDULO 3 -->
+  <div class="module-section">
+    <div class="module-header">
+      <div class="module-num m3">M3</div>
+      <div class="module-title">Toma de Decisiones Racional y Resolución de Problemas
+        <small>Semanas 12 – 16</small>
+      </div>
+      <div class="module-divider"></div>
+    </div>
+    <div class="weeks-grid">
+      <a href="semana12_actividad.html" class="week-card m3-card">
+        <div class="week-icon">🧩</div>
+        <div class="week-info">
+          <div class="week-num">Semana 12</div>
+          <div class="week-title">Estructura de la Decisión Racional</div>
+          <div class="week-badge">Maximin · Maximax</div>
+        </div>
+      </a>
+      <a href="semana13_actividad.html" class="week-card m3-card">
+        <div class="week-icon">📋</div>
+        <div class="week-info">
+          <div class="week-num">Semana 13</div>
+          <div class="week-title">Tablas de Decisión Lógica</div>
+          <div class="week-badge">Contradicción · 2ⁿ</div>
+        </div>
+      </a>
+      <a href="semana14_actividad.html" class="week-card m3-card">
+        <div class="week-icon">🌳</div>
+        <div class="week-info">
+          <div class="week-num">Semana 14</div>
+          <div class="week-title">Árboles de Decisión</div>
+          <div class="week-badge">VE · Nodos</div>
+        </div>
+      </a>
+      <a href="semana15_actividad.html" class="week-card m3-card">
+        <div class="week-icon">⚖️</div>
+        <div class="week-info">
+          <div class="week-num">Semana 15</div>
+          <div class="week-title">Criterios de Decisión</div>
+          <div class="week-badge">Hurwicz · Laplace</div>
+        </div>
+      </a>
+      <a href="semana16_actividad.html" class="week-card m3-card">
+        <div class="week-icon">🎓</div>
+        <div class="week-info">
+          <div class="week-num">Semana 16</div>
+          <div class="week-title">Ética y Justificación Racional</div>
+          <div class="week-badge">⭐ Actividad Final</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>Pensamiento Crítico · Universidad del Valle de Puebla</strong><br>
+    Planteles: Puebla · Tehuacán · Tlaxcala<br>
+    Los resultados se registran automáticamente en Google Sheets al terminar cada actividad.</p>
+  </div>
+
+</div>
+</body>
+</html>
