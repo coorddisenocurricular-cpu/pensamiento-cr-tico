@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 7 — Reconstrucción de Argumentos | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050e0a;--surface:#0a1a12;--card:#0f2218;--border:#1a3828;
+    --a1:#00d48b;--a2:#ffd166;--a3:#ef8c3e;--blue:#4cc9f0;
+    --green:#00d48b;--red:#ff5470;--text:#d4eee0;--muted:#2d6649;
+    --radius:14px;--glow:0 0 28px rgba(0,212,139,.25);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(0,212,139,.08) 0%,transparent 55%),
+               radial-gradient(ellipse 45% 35% at 85% 80%,rgba(255,209,102,.05) 0%,transparent 50%);
+    pointer-events:none}
+  /* subtle paper texture */
+  body::after{content:'';position:fixed;inset:0;z-index:0;opacity:.3;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' x='0' y='0' fill='rgba(0,212,139,0.06)'/%3E%3C/svg%3E");
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:36px 0 28px}
+  .badge{display:inline-block;background:rgba(0,212,139,.1);border:1px solid rgba(0,212,139,.28);color:var(--a1);font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5.5vw,3rem);font-style:italic;color:var(--text);margin-bottom:8px;line-height:1.1}
+  .header h1 span{font-style:normal;color:var(--a1)}
+  .header p{color:var(--muted);font-size:.9rem}
+
+  /* PRINCIPLE OF CHARITY strip */
+  .charity-strip{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:28px;border-left:3px solid var(--a1)}
+  .charity-strip h3{font-family:'DM Serif Display',serif;font-size:.92rem;color:var(--a1);margin-bottom:6px}
+  .charity-strip p{font-size:.82rem;color:var(--muted);line-height:1.55}
+  .charity-strip strong{color:var(--text)}
+
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--a1);color:#050e0a;box-shadow:var(--glow)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(0,212,139,.1)}
+  .form-group input::placeholder{color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--a1);color:#050e0a;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:none}
+  .btn-gold{background:var(--a2);color:#050e0a}
+  .btn-orange{background:var(--a3);color:#fff}
+
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--a2);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(0,212,139,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--a1);background:rgba(0,212,139,.12);color:var(--a1);box-shadow:0 0 16px rgba(0,212,139,.35);transform:scale(1.1)}
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--a2);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:500;color:var(--a2);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+
+  .q-tag{font-family:'DM Mono',monospace;font-size:.66rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);margin-bottom:10px}
+  .q-stem{font-size:1.02rem;font-weight:400;line-height:1.7;margin-bottom:22px}
+  .q-stem strong{color:var(--a2);font-weight:600}
+  .q-stem em{color:var(--a1);font-style:italic}
+  .mono{font-family:'DM Mono',monospace;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:.88em;color:var(--a1)}
+
+  /* TEXT PASSAGE */
+  .passage{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--a3);border-radius:10px;padding:18px 20px;font-style:italic;font-size:.96rem;line-height:1.75;margin-bottom:18px;color:var(--text)}
+
+  /* RECONSTRUCTION BOX */
+  .recon-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px;font-family:'DM Mono',monospace;font-size:.85rem}
+  .recon-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+  .recon-row:last-child{border-bottom:none}
+  .recon-label{font-size:.7rem;font-weight:500;letter-spacing:.06em;flex-shrink:0;padding-top:2px}
+  .recon-label.P{color:var(--blue)}.recon-label.C{color:var(--green)}.recon-label.I{color:var(--muted)}
+  .recon-text{color:var(--text);line-height:1.55}
+  .recon-text.implicit{color:var(--a3);font-style:italic}
+
+  /* OPTIONS */
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(0,212,139,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(0,212,139,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#050e0a}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(255,84,112,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+
+  /* TF */
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .tf-chip:hover:not(:disabled){border-color:var(--a1);background:rgba(0,212,139,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(0,212,139,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(255,84,112,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+
+  /* HIGHLIGHT PREMISE */
+  .highlight-text{font-size:1rem;line-height:2.2;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px}
+  .h-word{display:inline;padding:2px 4px;border-radius:4px;cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+  .h-word:hover:not(.answered-h){background:rgba(0,212,139,.12);border-color:var(--a1);color:var(--a1)}
+  .h-word.selected-h{background:rgba(255,209,102,.12);border-color:var(--a2);color:var(--a2)}
+  .h-word.correct-h{background:rgba(0,212,139,.15);border-color:var(--green);color:var(--green);pointer-events:none}
+  .h-word.wrong-h{background:rgba(255,84,112,.1);border-color:var(--red);color:var(--red);pointer-events:none}
+  .h-word.answered-h{pointer-events:none}
+
+  /* DRAG SORT */
+  .sort-list{display:grid;gap:8px;margin-bottom:14px}
+  .sort-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;cursor:grab;display:flex;align-items:flex-start;gap:12px;font-size:.9rem;line-height:1.5;transition:all .2s;user-select:none}
+  .sort-item:active{cursor:grabbing}
+  .sort-item.dragging{opacity:.45;transform:scale(.97)}
+  .sort-item.drag-over{border-color:var(--a1);background:rgba(0,212,139,.07)}
+  .drag-handle{color:var(--muted);font-size:1rem;flex-shrink:0;margin-top:2px}
+  .step-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--a1);min-width:22px;flex-shrink:0;margin-top:2px}
+
+  /* IMPLICIT PREMISE SELECTOR */
+  .impl-options{display:grid;gap:10px}
+  .impl-opt{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;font-size:.9rem;line-height:1.55;transition:all .2s;font-style:italic;color:var(--text)}
+  .impl-opt:hover:not(:disabled){border-color:var(--a3);background:rgba(239,140,62,.07);transform:translateX(4px)}
+  .impl-opt.correct-impl{border-color:var(--green);background:rgba(0,212,139,.07)}
+  .impl-opt.wrong-impl{border-color:var(--red);background:rgba(255,84,112,.07);opacity:.7}
+  .impl-opt:disabled{pointer-events:none}
+
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(0,212,139,.09);border:1px solid rgba(0,212,139,.25);color:var(--green)}
+  .feedback.err{background:rgba(255,84,112,.07);border:1px solid rgba(255,84,112,.2);color:var(--red)}
+
+  .section-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .result-trophy{font-size:4rem;text-align:center;margin:10px 0 16px}
+  .result-title{font-family:'DM Serif Display',serif;font-size:2rem;font-style:italic;text-align:center;margin-bottom:8px}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.92rem}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'DM Mono',monospace;font-size:1.5rem;font-weight:500;color:var(--a1)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(5,14,10,.3);border-top-color:#050e0a;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){.card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}.tab-btn{font-size:.72rem;padding:9px 4px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">∴ Semana 7 · Pensamiento Crítico · UVP</div>
+    <h1><span>Reconstrucción</span><br>de Argumentos</h1>
+    <p>Premisas implícitas · Principio de Caridad · Argumentos en contexto</p>
+  </div>
+
+  <div class="charity-strip">
+    <h3>Principio de Caridad</h3>
+    <p>Al reconstruir un argumento, <strong>elige siempre la interpretación más razonable y fuerte</strong> del interlocutor. No lo hagas quedar peor de lo que intentó decir.</p>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs" id="plantel-tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Ej. Valentina Ríos Soto"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="hidden">
+    <div class="xp-row"><span style="font-size:1.3rem">⚡</span><div class="xp-label">XP acumulados</div><div class="xp-val" id="xp-display">0 XP</div></div>
+    <div class="streak-row"><span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span><span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span><span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span></div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div><div class="timer-num" id="timer-num">30</div></div>
+      <div class="q-tag" id="q-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">¡Completado!</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">Guardar resultado</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+const LEVELS=[
+  /* L1 MCQ — ¿qué es una premisa implícita? */
+  {id:1,tag:"Nivel 1 — Premisas implícitas",xp:50,time:28,type:"mcq",
+   stem:"En el argumento: <em>«Deberías votar por el candidato verde porque es el más honesto.»</em><br><br>¿Qué premisa queda <strong>implícita</strong> (no dicha, pero necesaria)?",
+   opts:[
+     "El candidato verde tiene experiencia en política.",
+     "Deberías votar por el candidato más honesto.",
+     "La honestidad es irrelevante para votar.",
+     "Todos los candidatos son honestos por igual."
+   ],
+   correct:1,
+   fb_ok:"✅ Correcto. La premisa implícita es la conexión general: «Deberías votar por quien sea más honesto». Sin ella, el argumento no se sostiene.",
+   fb_err:"Para pasar de «es el más honesto» a «deberías votarlo», necesitas la premisa implícita «deberías votar por el más honesto». Eso es lo que el hablante da por sentado."},
+
+  /* L2 TF — Principio de Caridad */
+  {id:2,tag:"Nivel 2 — Principio de Caridad",xp:70,time:25,type:"tf",
+   stem:"Afirmación: <em>«Aplicar el Principio de Caridad significa que siempre debes <strong>estar de acuerdo</strong> con el argumento del interlocutor.»</em>",
+   correct:false,
+   fb_ok:"✅ Falso. El Principio de Caridad dice que debes interpretar el argumento de la manera más <strong>razonable y fuerte posible</strong>, no que debas aceptarlo. Puedes refutarlo con rigor después.",
+   fb_err:"Es Falso. Caridad ≠ acuerdo. Significa dar la mejor lectura posible al argumento antes de criticarlo. Puedes y debes refutarlo con argumentos propios si no lo aceptas."},
+
+  /* L3 Hotspot — identifica la conclusión */
+  {id:3,tag:"Nivel 3 — Identifica la conclusión",xp:90,time:30,type:"hotspot",
+   stem:"En el siguiente texto político, <strong>toca la oración que funciona como CONCLUSIÓN</strong> del argumento:",
+   sentences:[
+     {text:"La inseguridad ha aumentado en los últimos años.",isConc:false},
+     {text:"El presupuesto de policía fue recortado el año pasado.",isConc:false},
+     {text:"Por lo tanto, debemos restaurar el presupuesto de seguridad.",isConc:true},
+     {text:"Las ciudades con más policías tienen menores índices de delito.",isConc:false},
+   ],
+   fb_ok:"✅ ¡Correcto! «Por lo tanto» es el indicador de conclusión más claro. Las demás oraciones son premisas que la sostienen.",
+   fb_err:"La conclusión se identifica por indicadores como «por lo tanto», «en consecuencia», «de ahí que». Las otras oraciones son evidencia (premisas)."},
+
+  /* L4 MCQ — premisa implícita en contexto legal */
+  {id:4,tag:"Nivel 4 — Contexto legal",xp:110,time:30,type:"mcq",
+   stem:"Un fiscal argumenta: <em>«El acusado tenía motivo y oportunidad. Por lo tanto, es culpable.»</em><br><br>¿Cuál es la premisa implícita que conecta motivo+oportunidad con culpabilidad?",
+   opts:[
+     "Toda persona con motivo es automáticamente culpable.",
+     "Si alguien tiene motivo y oportunidad, eso es suficiente para probar culpabilidad más allá de duda razonable.",
+     "El acusado no tiene coartada.",
+     "Tener motivo equivale a haber cometido el delito."
+   ],
+   correct:1,
+   fb_ok:"✅ Exacto. La premisa implícita es que tener motivo + oportunidad es evidencia suficiente de culpabilidad. Un abogado defensor atacaría precisamente esa premisa oculta.",
+   fb_err:"La premisa implícita es que motivo + oportunidad equivale a culpabilidad suficiente. Esa suposición es el eslabón más frágil del argumento del fiscal."},
+
+  /* L5 Ordena los pasos de reconstrucción */
+  {id:5,tag:"Nivel 5 — Pasos de reconstrucción",xp:150,time:38,type:"order",
+   stem:"Ordena los pasos correctos para <strong>reconstruir formalmente</strong> un argumento a partir de un texto natural:",
+   items:[
+     {text:"Leer el texto e identificar el tema y la posición central del autor.", order:1},
+     {text:"Subrayar indicadores de premisa («porque», «ya que», «dado que») y de conclusión («por lo tanto», «en consecuencia»).", order:2},
+     {text:"Aplicar el Principio de Caridad: elegir la interpretación más fuerte y razonable.", order:3},
+     {text:"Hacer explícitas las premisas implícitas que el argumento necesita para ser válido.", order:4},
+     {text:"Escribir la forma estándar: P1, P2 [+ premisas implícitas] ∴ C.", order:5},
+   ],
+   fb_ok:"✅ ¡Orden correcto! Lectura global → marcadores → caridad → premisas implícitas → forma estándar.",
+   fb_err:"El orden es: 1) leer y ubicar la tesis, 2) identificar marcadores, 3) aplicar caridad, 4) explicitar premisas implícitas, 5) escribir la forma estándar P1,P2 ∴ C."},
+
+  /* L6 MCQ — Reconstrucción de argumento diagnóstico */
+  {id:6,tag:"Nivel 6 — Argumento diagnóstico",xp:200,time:32,type:"mcq",
+   stem:"Un médico dice: <em>«El paciente tiene fiebre y manchas rojas. Eso es sarampión.»</em><br><br>Al reconstruir este argumento, ¿cuál es la <strong>premisa implícita más importante</strong> que el médico está asumiendo?",
+   opts:[
+     "El paciente no ha sido vacunado contra el sarampión.",
+     "Todos los pacientes con fiebre tienen sarampión.",
+     "La fiebre con manchas rojas es un síntoma diagnóstico suficiente de sarampión.",
+     "El médico tiene experiencia con enfermedades infecciosas."
+   ],
+   correct:2,
+   fb_ok:"✅ Excelente reconstrucción. La premisa implícita es la regla diagnóstica general: «fiebre + manchas rojas = sarampión». Sin ella, el argumento no concluye nada. Un segundo médico podría cuestionar exactamente esa regla.",
+   fb_err:"La premisa implícita es la regla diagnóstica que conecta los síntomas con el diagnóstico: «fiebre + manchas rojas es suficiente para diagnosticar sarampión». Eso es lo que el médico da por sentado."}
+];
+
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,orderDrag:null};
+
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim();
+  const m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}
+  if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){
+  const r=document.getElementById('levels-row');r.innerHTML='';
+  LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)});
+}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.orderDrag=null;
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({mcq:renderMCQ,tf:renderTF,hotspot:renderHotspot,order:renderOrder})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderTF(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Verdadero</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Falso</button></div>`;
+}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderHotspot(lvl,body){
+  let html=`<div class="q-stem">${lvl.stem}</div><div class="highlight-text">`;
+  lvl.sentences.forEach((s,i)=>{
+    html+=`<span class="h-word" data-idx="${i}" data-conc="${s.isConc}" onclick="answerHotspot(this)">${s.text}</span> `;
+  });
+  html+=`</div>`;
+  body.innerHTML=html;
+}
+function answerHotspot(el){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=el.dataset.conc==='true';
+  document.querySelectorAll('.h-word').forEach(w=>{w.classList.add('answered-h');if(w.dataset.conc==='true')w.classList.add('correct-h')});
+  if(!ok)el.classList.add('wrong-h');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderOrder(lvl,body){
+  const shuffled=[...lvl.items].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="sort-list" id="slist"></div>
+  <button class="btn btn-full btn-orange" id="btn-chk" onclick="checkOrder()">Verificar orden ✓</button>`;
+  const list=body.querySelector('#slist');
+  shuffled.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='sort-item';d.dataset.order=item.order;d.draggable=true;
+    d.innerHTML=`<span class="drag-handle">⠿</span><span class="step-num">#${i+1}</span><span>${item.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDrag=d;d.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    d.addEventListener('dragend',()=>{d.classList.remove('dragging');S.orderDrag=null});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('drag-over')});
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over'));
+    d.addEventListener('drop',e=>{
+      e.preventDefault();d.classList.remove('drag-over');
+      if(S.orderDrag&&S.orderDrag!==d){
+        const items=[...list.children];const a=items.indexOf(S.orderDrag),b=items.indexOf(d);
+        if(a<b)list.insertBefore(S.orderDrag,d.nextSibling);else list.insertBefore(S.orderDrag,d);
+        [...list.children].forEach((el,i)=>el.querySelector('.step-num').textContent='#'+(i+1));
+      }
+    });
+    list.appendChild(d);
+  });
+}
+function checkOrder(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const list=document.getElementById('slist');
+  let ok=true;
+  [...list.children].forEach((el,i)=>{const c=parseInt(el.dataset.order)===i+1;if(!c)ok=false;el.style.borderColor=c?'var(--green)':'var(--red)';el.style.background=c?'rgba(0,212,139,.07)':'rgba(255,84,112,.07)'});
+  document.getElementById('btn-chk').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;
+  const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}
+    if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}
+  },1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;
+  const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  document.querySelectorAll('.h-word').forEach(w=>{w.classList.add('answered-h');if(w.dataset.conc==='true')w.classList.add('correct-h')});
+  ['btn-chk'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+function earnXP(lvl){const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;document.getElementById('st'+S.cur).classList.add('lit');document.getElementById('xp-display').textContent=S.xp+' XP';showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP ⚡</em>`:''))}
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='¡Actividad completada!',sub='Repasa las premisas implícitas y el Principio de Caridad.';
+  if(pct>=83){trophy='🏆';title='¡Analista de argumentos!';sub='Reconstruyes argumentos como un filósofo. ¡A la Semana 8!';}
+  else if(pct>=60){trophy='🥈';title='¡Buen razonamiento!';sub='Enfócate en identificar las premisas implícitas.';}
+  document.getElementById('result-trophy').textContent=trophy;document.getElementById('result-title').textContent=title;document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;document.getElementById('r-xp').textContent=S.xp;document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');
+  btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:7,tema:"Reconstrucción de Argumentos en Contexto",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado guardado','ok');lbl.textContent='✓ Guardado';}
+  catch(e){showToast('❌ Error al guardar','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>

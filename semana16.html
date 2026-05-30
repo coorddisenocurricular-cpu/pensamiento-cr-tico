@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 16 — Ética y Justificación Racional | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07050e;--surface:#0f0c1e;--card:#16122a;--border:#241e42;
+    --a1:#e9c46a;--a2:#f4a261;--a3:#e76f51;--blue:#4cc9f0;
+    --green:#52b788;--red:#e63946;--purple:#c77dff;
+    --text:#faf0e0;--muted:#4a3e6a;--radius:14px;
+    --glow:0 0 28px rgba(233,196,106,.25);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(233,196,106,.08) 0%,transparent 55%),
+               radial-gradient(ellipse 45% 35% at 85% 85%,rgba(231,111,81,.05) 0%,transparent 50%);pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:36px 0 24px}
+  .badge{display:inline-block;background:rgba(233,196,106,.1);border:1px solid rgba(233,196,106,.28);color:var(--a1);font-family:'Courier Prime',monospace;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5.5vw,2.9rem);font-weight:700;line-height:1.1;margin-bottom:10px;
+    background:linear-gradient(135deg,#fff 10%,var(--a1) 50%,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header p{color:var(--muted);font-size:.9rem}
+  /* final boss decoration */
+  .final-banner{background:linear-gradient(135deg,rgba(233,196,106,.08),rgba(231,111,81,.06));border:1px solid rgba(233,196,106,.2);border-radius:12px;padding:18px 22px;margin-bottom:26px;text-align:center}
+  .final-banner .fb-emoji{font-size:2.4rem;margin-bottom:8px}
+  .final-banner h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--a1);margin-bottom:6px}
+  .final-banner p{font-size:.85rem;color:var(--muted);line-height:1.6}
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Source Sans 3',sans-serif;font-size:.82rem;font-weight:700;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--a1);color:#07050e;box-shadow:var(--glow)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(233,196,106,.1)}
+  .form-group input::placeholder{color:var(--muted)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--a1);color:#07050e;border:none;border-radius:9px;font-family:'Source Sans 3',sans-serif;font-size:.92rem;font-weight:700;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:none}
+  .btn-gold{background:var(--a1);color:#07050e}
+  .btn-blue{background:var(--blue);color:#07050e}
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'Courier Prime',monospace;font-size:1.1rem;color:var(--a1);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:.75rem;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--a1);background:rgba(233,196,106,.12);color:var(--a1);box-shadow:0 0 16px rgba(233,196,106,.3);transform:scale(1.1)}
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--a1);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'Courier Prime',monospace;font-size:.88rem;color:var(--a1);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+  .q-tag{font-family:'Courier Prime',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);margin-bottom:10px}
+  .q-stem{font-size:1rem;font-weight:400;line-height:1.75;margin-bottom:22px}
+  .q-stem strong{color:var(--a1);font-weight:700}
+  .q-stem em{color:var(--a2);font-style:italic}
+  .dilemma-box{background:var(--surface);border-left:3px solid var(--a2);border-radius:10px;padding:18px 20px;margin-bottom:16px;font-style:italic;font-size:.96rem;line-height:1.75;color:var(--text)}
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(233,196,106,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:.75rem;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(82,183,136,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#07050e}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .tf-chip:hover:not(:disabled){border-color:var(--a1);background:rgba(233,196,106,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+  /* ETHICAL FRAMEWORK PICKER */
+  .frame-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .frame-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s}
+  .frame-btn:hover:not(:disabled){transform:translateY(-2px)}
+  .frame-btn .fb-name{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;margin-bottom:4px}
+  .frame-btn .fb-desc{font-size:.75rem;color:var(--muted);line-height:1.4}
+  .frame-btn.util .fb-name{color:var(--blue)} .frame-btn.util:hover:not(:disabled){border-color:var(--blue);background:rgba(76,201,240,.07)}
+  .frame-btn.deont .fb-name{color:var(--a1)} .frame-btn.deont:hover:not(:disabled){border-color:var(--a1);background:rgba(233,196,106,.07)}
+  .frame-btn.virtue .fb-name{color:var(--green)} .frame-btn.virtue:hover:not(:disabled){border-color:var(--green);background:rgba(82,183,136,.07)}
+  .frame-btn.contract .fb-name{color:var(--purple)} .frame-btn.contract:hover:not(:disabled){border-color:var(--purple);background:rgba(199,125,255,.07)}
+  .frame-btn.correct-fb{border-color:var(--green)!important;background:rgba(82,183,136,.08)!important}
+  .frame-btn.wrong-fb{border-color:var(--red)!important;background:rgba(230,57,70,.07)!important;opacity:.65}
+  .frame-btn:disabled{pointer-events:none}
+  /* DRAG */
+  .sort-list{display:grid;gap:8px;margin-bottom:14px}
+  .sort-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;cursor:grab;display:flex;align-items:flex-start;gap:12px;font-size:.9rem;line-height:1.5;transition:all .2s;user-select:none}
+  .sort-item:active{cursor:grabbing}
+  .sort-item.dragging{opacity:.45;transform:scale(.97)}
+  .sort-item.drag-over{border-color:var(--a1);background:rgba(233,196,106,.07)}
+  .drag-handle{color:var(--muted);font-size:1rem;flex-shrink:0;margin-top:2px}
+  .step-num{font-family:'Courier Prime',monospace;font-size:.72rem;color:var(--a1);min-width:22px;flex-shrink:0;margin-top:2px}
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(82,183,136,.09);border:1px solid rgba(82,183,136,.25);color:var(--green)}
+  .feedback.err{background:rgba(230,57,70,.07);border:1px solid rgba(230,57,70,.2);color:var(--red)}
+  .section-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  /* FINAL RESULT SPECIAL */
+  .result-trophy{font-size:5rem;text-align:center;margin:10px 0 16px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .result-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;text-align:center;margin-bottom:8px;color:var(--a1)}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:16px;font-size:.92rem;line-height:1.6}
+  .completion-badge{background:linear-gradient(135deg,rgba(233,196,106,.15),rgba(244,162,97,.1));border:1px solid rgba(233,196,106,.3);border-radius:12px;padding:16px 20px;text-align:center;margin-bottom:24px}
+  .completion-badge h3{font-family:'Playfair Display',serif;color:var(--a1);margin-bottom:6px}
+  .completion-badge p{font-size:.82rem;color:var(--muted)}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'Courier Prime',monospace;font-size:1.5rem;color:var(--a1)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(7,5,14,.3);border-top-color:#07050e;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){.card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}.tab-btn{font-size:.72rem;padding:9px 4px}.frame-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">✦ Semana 16 · Final · Pensamiento Crítico · UVP</div>
+    <h1>Ética y Justificación<br>Racional</h1>
+    <p>Utilitarismo · Deontología · Ética de la virtud · Valores como premisas</p>
+  </div>
+  <div class="final-banner">
+    <div class="fb-emoji">🎓</div>
+    <h2>Actividad Final del Cuatrimestre</h2>
+    <p>Has llegado a la última semana. Esta actividad integra la lógica con la ética: los valores funcionan como <em>premisas mayores</em> en la toma de decisiones racionales.</p>
+  </div>
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-plantel="Puebla" onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn" data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn" data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Tu nombre completo"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad final →</button>
+  </div>
+  <div id="screen-game" class="hidden">
+    <div class="xp-row"><span style="font-size:1.3rem">⚡</span><div class="xp-label">XP acumulados</div><div class="xp-val" id="xp-display">0 XP</div></div>
+    <div class="streak-row"><span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span><span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span><span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span></div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div><div class="timer-num" id="timer-num">30</div></div>
+      <div class="q-tag" id="q-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">¡Cuatrimestre completado!</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="completion-badge">
+      <h3>✦ Pensamiento Crítico — UVP ✦</h3>
+      <p>Has completado las 16 semanas de actividades gamificadas.<br>Tu razonamiento lógico ha crecido considerablemente.</p>
+    </div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">Guardar resultado final</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+const LEVELS=[
+  {id:1,tag:"Nivel 1 — Valores como premisas",xp:50,time:28,type:"mcq",
+   stem:"En la decisión de un médico: <em>«Los pacientes deben recibir el mejor tratamiento posible. Este paciente necesita el tratamiento X. ∴ Este paciente debe recibir el tratamiento X.»</em><br><br>La primera oración es un <strong>valor ético</strong>. ¿Qué función lógica cumple en el argumento?",
+   opts:["Es una conclusión derivada de hechos médicos.","Es la premisa mayor: un juicio de valor que funciona como norma general del razonamiento.","Es un hecho empírico verificable en el laboratorio.","Es una falacia de apelación a la emoción."],
+   correct:1,
+   fb_ok:"✅ Correcto. Los valores éticos funcionan como premisas mayores: normas generales que, combinadas con hechos específicos, generan decisiones justificadas racionalmente. La lógica no puede derivar valores de hechos solos (guillotina de Hume).",
+   fb_err:"Los valores son premisas mayores en el razonamiento práctico. No son hechos empíricos ni conclusiones: son el punto de partida normativo que dirige la decisión."},
+  {id:2,tag:"Nivel 2 — Marco ético",xp:70,time:30,type:"framepicker",
+   stem:"Un ingeniero debe decidir si reportar una falla que podría perjudicar económicamente a su empresa, pero podría salvar vidas. <em>«Debo reportarla porque tengo el deber de proteger la seguridad pública, independientemente de las consecuencias económicas.»</em><br><br>¿Qué marco ético usa este razonamiento?",
+   correct:"deont",
+   fb_ok:"✅ Deontología. El ingeniero actúa por deber (la obligación de proteger), sin importar las consecuencias económicas. Kant diría: actúa según el deber, no según el resultado.",
+   fb_err:"Es Deontología: actuar por obligación/deber independientemente de las consecuencias. El Utilitarismo elegiría la acción con mejores consecuencias totales. Aquí el deber manda."},
+  {id:3,tag:"Nivel 3 — Verdadero o Falso",xp:80,time:25,type:"tf",
+   stem:"Afirmación: <em>«La lógica formal puede, por sí sola, decirnos qué valores debemos tener. Basta razonar correctamente para derivar obligaciones morales de hechos puros.»</em>",
+   correct:false,
+   fb_ok:"✅ Falso. Esta es la Guillotina de Hume: no se puede derivar un 'deber' de un 'es'. La lógica puede verificar la coherencia de nuestros valores y ayudarnos a aplicarlos consistentemente, pero no puede generar valores desde cero.",
+   fb_err:"Es Falso. La Guillotina de Hume establece que no se puede derivar juicios normativos (lo que debo hacer) solo de juicios descriptivos (lo que es). Los valores son premisas que el razonamiento presupone, no conclusions que produce."},
+  {id:4,tag:"Nivel 4 — Dilema ético",xp:110,time:32,type:"mcq",
+   stem:"Dilema: <em>Un médico tiene un solo riñón disponible para trasplante. Dos pacientes lo necesitan: uno es un joven de 20 años, el otro es un científico de 60 que está a punto de publicar una cura para el cáncer.</em><br><br>Un utilitarista puro diría:",
+   opts:[
+     "Dar el riñón al joven porque tiene más años de vida potencial.",
+     "Dar el riñón al científico porque maximiza el bienestar total de la humanidad.",
+     "No se puede decidir porque ambas vidas tienen el mismo valor intrínseco.",
+     "Dar el riñón al que llegó primero a la lista de espera, independientemente del cálculo."
+   ],
+   correct:1,
+   fb_ok:"✅ El utilitarismo elegiría al científico porque su supervivencia maximiza el bienestar total (cura para el cáncer → beneficia a millones). El utilitarismo calcula consecuencias, no aplica reglas fijas. Nótese que esta postura es éticamente controversial.",
+   fb_err:"El utilitarismo = maximizar el bienestar total. El científico a punto de publicar una cura potencialmente beneficia a millones → mayor utilidad total. La deontología o igualitarismo podrían discrepar."},
+  {id:5,tag:"Nivel 5 — Ordena el argumento ético",xp:150,time:38,type:"order",
+   stem:"Ordena los pasos de un <strong>argumento ético justificado racionalmente</strong> para una decisión difícil:",
+   items:[
+     {text:"Identificar el dilema o decisión que requiere justificación ética.",order:1},
+     {text:"Explicitar los valores o principios éticos que funcionan como premisas mayores.",order:2},
+     {text:"Describir los hechos relevantes del caso (premisas menores).",order:3},
+     {text:"Derivar la conclusión: la acción o decisión que se sigue del valor + hecho.",order:4},
+     {text:"Evaluar si la conclusión es coherente con otros valores y si produce consecuencias aceptables.",order:5},
+   ],
+   fb_ok:"✅ ¡Orden correcto! Un argumento ético riguroso: identifica el problema → explicita valores → describe hechos → deriva conclusión → evalúa coherencia y consecuencias.",
+   fb_err:"Orden: 1) identificar dilema, 2) explicitar valores/premisas, 3) hechos del caso, 4) derivar conclusión, 5) evaluar coherencia y consecuencias."},
+  {id:6,tag:"Nivel 6 — Integración final",xp:200,time:35,type:"mcq",
+   stem:"A lo largo del curso estudiaste: proposiciones, tablas de verdad, reglas de inferencia, falacias, definiciones, argumentos, aplicaciones disciplinarias, teoría de la decisión y ética.<br><br>¿Cuál es el <strong>vínculo fundamental</strong> que une todos estos temas?",
+   opts:[
+     "Todos son temas independientes que se estudian por separado en distintas carreras.",
+     "Todos son herramientas para memorizar fórmulas y símbolos lógicos correctamente.",
+     "Todos desarrollan la capacidad de razonar con claridad, detectar errores, tomar decisiones justificadas y actuar con coherencia entre valores y acciones.",
+     "La lógica solo sirve para matemáticas e ingeniería, no para ética ni decisiones cotidianas."
+   ],
+   correct:2,
+   fb_ok:"✅ Exacto. El pensamiento crítico es la habilidad transversal que integra todo: razonar con precisión, reconocer falacias, definir con claridad, decidir bajo incertidumbre y justificar éticamente las acciones. No es solo lógica formal — es una forma de vida intelectual.",
+   fb_err:"El pensamiento crítico integra todo: precisión lógica, detección de errores, toma de decisiones informada y coherencia ética. Es una competencia transversal para cualquier disciplina y para la vida."}
+];
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,orderDrag:null};
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim(),m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){const r=document.getElementById('levels-row');r.innerHTML='';LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)})}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.orderDrag=null;
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({mcq:renderMCQ,tf:renderTF,framepicker:renderFramePicker,order:renderOrder})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);document.getElementById('btn-next').classList.remove('hidden');
+}
+function renderTF(lvl,body){body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Verdadero</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Falso</button></div>`}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);document.getElementById('btn-next').classList.remove('hidden');
+}
+function renderFramePicker(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="frame-grid">
+    <button class="frame-btn util" onclick="answerFrame('util',this)"><div class="fb-name">Utilitarismo</div><div class="fb-desc">Maximiza el bienestar total de las consecuencias.</div></button>
+    <button class="frame-btn deont" onclick="answerFrame('deont',this)"><div class="fb-name">Deontología</div><div class="fb-desc">Actúa por deber y respeto a normas universales.</div></button>
+    <button class="frame-btn virtue" onclick="answerFrame('virtue',this)"><div class="fb-name">Ética de la Virtud</div><div class="fb-desc">¿Qué haría una persona virtuosa?</div></button>
+    <button class="frame-btn contract" onclick="answerFrame('contract',this)"><div class="fb-name">Contractualismo</div><div class="fb-desc">Normas que todos aceptarían bajo imparcialidad.</div></button>
+  </div>`;
+}
+function answerFrame(val,btn){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  document.querySelectorAll('.frame-btn').forEach(b=>b.disabled=true);
+  document.querySelector(`.frame-btn.${lvl.correct}`).classList.add('correct-fb');
+  if(!ok)btn.classList.add('wrong-fb');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);document.getElementById('btn-next').classList.remove('hidden');
+}
+function renderOrder(lvl,body){
+  const shuffled=[...lvl.items].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="sort-list" id="slist"></div>
+  <button class="btn btn-full btn-blue" id="btn-chk" onclick="checkOrder()">Verificar orden ✓</button>`;
+  const list=body.querySelector('#slist');
+  shuffled.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='sort-item';d.dataset.order=item.order;d.draggable=true;
+    d.innerHTML=`<span class="drag-handle">⠿</span><span class="step-num">#${i+1}</span><span>${item.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDrag=d;d.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    d.addEventListener('dragend',()=>{d.classList.remove('dragging');S.orderDrag=null});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('drag-over')});
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over'));
+    d.addEventListener('drop',e=>{e.preventDefault();d.classList.remove('drag-over');if(S.orderDrag&&S.orderDrag!==d){const its=[...list.children];const a=its.indexOf(S.orderDrag),b=its.indexOf(d);if(a<b)list.insertBefore(S.orderDrag,d.nextSibling);else list.insertBefore(S.orderDrag,d);[...list.children].forEach((el,i)=>el.querySelector('.step-num').textContent='#'+(i+1))}});
+    list.appendChild(d);
+  });
+}
+function checkOrder(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const list=document.getElementById('slist');let ok=true;
+  [...list.children].forEach((el,i)=>{const c=parseInt(el.dataset.order)===i+1;if(!c)ok=false;el.style.borderColor=c?'var(--green)':'var(--red)';el.style.background=c?'rgba(82,183,136,.07)':'rgba(230,57,70,.07)'});
+  document.getElementById('btn-chk').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);document.getElementById('btn-next').classList.remove('hidden');
+}
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}},1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  document.querySelectorAll('.frame-btn').forEach(b=>{b.disabled=true;if(b.classList.contains(lvl.correct))b.classList.add('correct-fb')});
+  ['btn-chk'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);document.getElementById('btn-next').classList.remove('hidden');
+}
+function earnXP(lvl){const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;document.getElementById('st'+S.cur).classList.add('lit');document.getElementById('xp-display').textContent=S.xp+' XP';showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP ⚡</em>`:'')); }
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🎓',title='¡Cuatrimestre completado!',sub='Has concluido las 16 semanas de Pensamiento Crítico.';
+  if(pct>=83){trophy='🏆';title='¡Excelencia en Pensamiento Crítico!';sub='Dominas la lógica, las decisiones y la ética. ¡Felicitaciones!';}
+  else if(pct>=60){trophy='🥈';title='¡Buen cierre de cuatrimestre!';sub='Repasa los marcos éticos y la integración final del curso.';}
+  document.getElementById('result-trophy').textContent=trophy;document.getElementById('result-title').textContent=title;document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;document.getElementById('r-xp').textContent=S.xp;document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:16,tema:"Ética y Justificación Racional — Actividad Final",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado final guardado','ok');lbl.textContent='✓ Guardado';}
+  catch(e){showToast('❌ Error','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 8 — Lógica y Definición | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0614;--surface:#110a22;--card:#180f30;--border:#261844;
+    --a1:#c77dff;--a2:#7b2fff;--a3:#48bfe3;--gold:#ffd166;
+    --green:#56cfe1;--red:#ff6b6b;--text:#e8deff;--muted:#5a4280;
+    --radius:14px;--glow:0 0 28px rgba(199,125,255,.3);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 65% 50% at 20% 10%,rgba(199,125,255,.09) 0%,transparent 55%),
+               radial-gradient(ellipse 50% 40% at 80% 90%,rgba(72,191,227,.06) 0%,transparent 50%);
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:36px 0 24px}
+  .badge{display:inline-block;background:rgba(199,125,255,.1);border:1px solid rgba(199,125,255,.28);color:var(--a1);font-family:'Courier Prime',monospace;font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-size:clamp(1.9rem,5.5vw,2.8rem);font-weight:700;line-height:1.1;margin-bottom:10px;
+    background:linear-gradient(135deg,#fff 10%,var(--a1) 55%,var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header p{color:var(--muted);font-size:.9rem}
+
+  /* concept strip */
+  .concept-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+  .concept-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+  .concept-card h3{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .concept-card.amb h3{color:var(--a1)} .concept-card.vag h3{color:var(--a3)}
+  .concept-card p{font-size:.8rem;color:var(--muted);line-height:1.5}
+  .concept-card strong{color:var(--text)}
+
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:600;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--a1);color:#0a0614;box-shadow:var(--glow)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(199,125,255,.12)}
+  .form-group input::placeholder{color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--a1);color:#0a0614;border:none;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:.92rem;font-weight:700;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:none}
+  .btn-gold{background:var(--gold);color:#0a0614}
+  .btn-teal{background:var(--a3);color:#0a0614}
+
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'Courier Prime',monospace;font-size:1.1rem;font-weight:700;color:var(--gold);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:.75rem;font-weight:700;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(86,207,225,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--a1);background:rgba(199,125,255,.12);color:var(--a1);box-shadow:0 0 16px rgba(199,125,255,.35);transform:scale(1.1)}
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--a2),var(--a1),var(--a3));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--a1);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'Courier Prime',monospace;font-size:.88rem;font-weight:700;color:var(--a1);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+
+  .q-tag{font-family:'Courier Prime',monospace;font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);margin-bottom:10px}
+  .q-stem{font-size:1.02rem;font-weight:400;line-height:1.7;margin-bottom:22px}
+  .q-stem strong{color:var(--gold);font-weight:600}
+  .q-stem em{color:var(--a1);font-style:italic}
+  .mono{font-family:'Courier Prime',monospace;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:.9em;color:var(--a1)}
+
+  /* WORD DEFINITION GAME */
+  .def-word{font-family:'Courier Prime',monospace;font-size:2rem;font-weight:700;color:var(--a1);text-align:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;letter-spacing:.04em}
+  .def-choices{display:grid;gap:10px}
+  .def-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px 18px;text-align:left;cursor:pointer;transition:all .2s;font-size:.9rem;line-height:1.55;color:var(--text)}
+  .def-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(199,125,255,.07);transform:translateX(4px)}
+  .def-btn.correct{border-color:var(--green);background:rgba(86,207,225,.07)}
+  .def-btn.wrong{border-color:var(--red);background:rgba(255,107,107,.07);opacity:.7}
+  .def-btn:disabled{pointer-events:none}
+
+  /* AMBIGUITY CLASSIFIER */
+  .amb-sentence{background:var(--surface);border-left:3px solid var(--a1);border-radius:10px;padding:16px 20px;font-size:1rem;line-height:1.7;margin-bottom:16px;font-style:italic}
+  .amb-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .amb-btn{padding:14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:.88rem;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+  .amb-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(199,125,255,.07)}
+  .amb-btn.correct-a{border-color:var(--green);background:rgba(86,207,225,.08);color:var(--green)}
+  .amb-btn.wrong-a{border-color:var(--red);background:rgba(255,107,107,.07);opacity:.65}
+  .amb-btn:disabled{pointer-events:none}
+
+  /* MCQ */
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(199,125,255,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:.75rem;font-weight:700;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(86,207,225,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#0a0614}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(255,107,107,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+
+  /* TF */
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .tf-chip:hover:not(:disabled){border-color:var(--a1);background:rgba(199,125,255,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(86,207,225,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(255,107,107,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+
+  /* VAGUENESS SPECTRUM */
+  .spectrum-box{margin:16px 0 22px}
+  .spectrum-labels{display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:8px}
+  .spectrum-labels span:first-child{color:var(--red)} .spectrum-labels span:last-child{color:var(--green)}
+  input[type=range]{-webkit-appearance:none;width:100%;height:10px;border-radius:100px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--surface);border:3px solid var(--a1);cursor:pointer;transition:transform .15s,border-color .2s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);border-color:var(--gold)}
+  .spectrum-val{text-align:center;font-family:'Courier Prime',monospace;font-size:1.1rem;font-weight:700;color:var(--gold);margin-top:8px}
+
+  /* MATCH PAIRS */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+  .match-col-title{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:8px}
+  .match-item{background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;font-size:.88rem;text-align:center;cursor:pointer;transition:all .2s;min-height:54px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+  .match-item:hover:not(.used):not(:disabled){border-color:var(--a1);background:rgba(199,125,255,.07)}
+  .match-item.selected{border-color:var(--gold);background:rgba(255,209,102,.08);color:var(--gold)}
+  .match-item.correct-m{border-color:var(--green);background:rgba(86,207,225,.08);color:var(--green);pointer-events:none}
+  .match-item.wrong-m{border-color:var(--red);background:rgba(255,107,107,.07);color:var(--red)}
+  .match-item.used{opacity:.3;pointer-events:none}
+  .match-score{font-family:'Courier Prime',monospace;font-size:.8rem;color:var(--muted);text-align:right;margin-top:6px}
+
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(86,207,225,.08);border:1px solid rgba(86,207,225,.22);color:var(--green)}
+  .feedback.err{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.2);color:var(--red)}
+
+  .section-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .result-trophy{font-size:4rem;text-align:center;margin:10px 0 16px}
+  .result-title{font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:8px}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.92rem}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'Courier Prime',monospace;font-size:1.5rem;font-weight:700;color:var(--a1)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(10,6,20,.3);border-top-color:#0a0614;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){.card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}.tab-btn{font-size:.72rem;padding:9px 4px}.concept-strip{grid-template-columns:1fr}.amb-choices{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">§ Semana 8 · Pensamiento Crítico · UVP</div>
+    <h1>Lógica y Definición<br>Precisión Conceptual</h1>
+    <p>Ambigüedad · Vaguedad · Definiciones operativas · 6 niveles</p>
+  </div>
+
+  <div class="concept-strip">
+    <div class="concept-card amb">
+      <h3>🔀 Ambigüedad</h3>
+      <p>Una palabra o enunciado tiene <strong>múltiples significados</strong> distintos. El lector no sabe cuál aplica en el contexto dado.</p>
+    </div>
+    <div class="concept-card vag">
+      <h3>≈ Vaguedad</h3>
+      <p>Una palabra tiene un significado <strong>impreciso o con bordes difusos</strong>. No está claro dónde comienza o termina su aplicación.</p>
+    </div>
+  </div>
+
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Ej. Diego Morales Luna"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad →</button>
+  </div>
+
+  <div id="screen-game" class="hidden">
+    <div class="xp-row"><span style="font-size:1.3rem">⚡</span><div class="xp-label">XP acumulados</div><div class="xp-val" id="xp-display">0 XP</div></div>
+    <div class="streak-row"><span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span><span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span><span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span></div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div><div class="timer-num" id="timer-num">30</div></div>
+      <div class="q-tag" id="q-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">¡Completado!</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">Guardar resultado</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+const LEVELS=[
+  {id:1,tag:"Nivel 1 — Ambigüedad o Vaguedad",xp:50,time:28,type:"ambclass",
+   stem:"Clasifica el problema de cada oración: ¿es <strong>Ambigüedad</strong> (múltiples significados) o <strong>Vaguedad</strong> (bordes difusos)?",
+   items:[
+     {text:"«El banco estaba lleno de gente.»",correct:"AMB",hint:"banco = institución financiera O asiento"},
+     {text:"«Era un hombre bastante alto.»",correct:"VAG",hint:"¿A partir de qué altura es 'alto'?"},
+     {text:"«Fui al partido anoche.»",correct:"AMB",hint:"partido = juego deportivo O agrupación política"},
+   ],
+   fb_ok:"✅ ¡Clasificación perfecta! Recuerda: ambigüedad = varios significados definidos; vaguedad = un significado sin bordes claros.",
+   fb_err:"Ambigüedad: múltiples significados (banco, partido). Vaguedad: significado impreciso (¿qué tan alto es 'alto'?)."},
+
+  {id:2,tag:"Nivel 2 — Definición operativa",xp:75,time:28,type:"mcq",
+   stem:"Un investigador estudia la 'pobreza'. Para su estudio, define pobreza como <em>«ingresos menores a $3,000 pesos mensuales por persona»</em>.<br><br>¿Qué tipo de definición es esta?",
+   opts:["Definición lexicográfica (de diccionario)","Definición operativa (medible y concreta)","Definición estipulativa creada para confundir","Definición persuasiva sin criterios"],
+   correct:1,
+   fb_ok:"✅ Correcto. Una definición operativa especifica criterios medibles y observables. Transforma un concepto vago ('pobreza') en algo preciso y verificable para la investigación.",
+   fb_err:"Es una definición operativa: transforma un concepto abstracto en criterios concretos y medibles. Esto elimina la vaguedad para propósitos de investigación."},
+
+  {id:3,tag:"Nivel 3 — Condiciones necesarias y suficientes",xp:90,time:30,type:"mcq",
+   stem:"Para que algo sea un <strong>triángulo</strong>:<br>• Tener 3 lados es una condición <em>necesaria</em> (sin eso no es triángulo).<br>• Tener 3 lados <em>Y</em> ser una figura plana cerrada es <em>suficiente</em> (garantiza que es triángulo).<br><br>Ahora: ¿es «tener corazón» una condición <em>necesaria</em> para ser mamífero?",
+   opts:["Sí, porque todos los mamíferos tienen corazón.","No, porque algunos mamíferos no tienen corazón.","Sí, pero solo es necesaria, no suficiente para ser mamífero.","No aplica porque los mamíferos no se definen así."],
+   correct:2,
+   fb_ok:"✅ Exacto. Tener corazón es necesaria (todo mamífero lo tiene) pero NO suficiente (muchos no-mamíferos también tienen corazón). La condición suficiente requeriría más criterios.",
+   fb_err:"Tener corazón es una condición necesaria para ser mamífero (todo mamífero lo tiene), pero no suficiente (los peces también tienen corazón y no son mamíferos)."},
+
+  {id:4,tag:"Nivel 4 — Verdadero o Falso",xp:80,time:25,type:"tf",
+   stem:"Afirmación: <em>«Una definición puede eliminar completamente la vaguedad de cualquier término del lenguaje natural.»</em>",
+   correct:false,
+   fb_ok:"✅ Falso. Toda definición en lenguaje natural tiene cierto grado residual de vaguedad o abre nuevos bordes difusos. Las definiciones operativas la reducen para un propósito específico, pero no la eliminan universalmente.",
+   fb_err:"Es Falso. La vaguedad es inherente al lenguaje natural. Las definiciones operativas la reducen para un contexto específico, pero siempre puede surgir vaguedad en los nuevos términos usados."},
+
+  {id:5,tag:"Nivel 5 — Empareja conceptos",xp:140,time:38,type:"match",
+   stem:"Empareja cada <strong>término</strong> con su <strong>descripción</strong> correcta.",
+   pairs:[
+     {left:"Ambigüedad semántica",right:"Una palabra tiene 2+ significados distintos"},
+     {left:"Vaguedad",right:"Bordes difusos: no hay criterio claro de aplicación"},
+     {left:"Definición operativa",right:"Criterios medibles que precisifican un concepto"},
+     {left:"Condición necesaria",right:"Sin ella, el concepto no aplica"},
+   ],
+   fb_ok:"✅ ¡Emparejamiento perfecto! Dominas la distinción entre los tipos de imprecisión lingüística y cómo corregirlos.",
+   fb_err:"Recuerda: ambigüedad=múltiples significados, vaguedad=bordes difusos, def. operativa=criterios medibles, condición necesaria=imprescindible."},
+
+  {id:6,tag:"Nivel 6 — Análisis de definición",xp:200,time:32,type:"mcq",
+   stem:"Un abogado argumenta: <em>«Mi cliente no robó porque 'robar' implica intención de apropiarse permanentemente del bien ajeno, y él solo pretendía usarlo por una hora.»</em><br><br>¿Qué estrategia lógica está usando el abogado?",
+   opts:[
+     "Está usando una falacia de equivocación al cambiar el significado de 'robar'.",
+     "Está precisando la definición de 'robar' para mostrar que el caso no cumple sus condiciones necesarias.",
+     "Está usando una definición persuasiva para manipular al jurado.",
+     "Está aplicando el Principio de Caridad al acusado."
+   ],
+   correct:1,
+   fb_ok:"✅ Análisis correcto. El abogado está usando definiciones precisas estratégicamente: al especificar la condición necesaria 'intención permanente', demuestra que el caso no satisface la definición legal de robo.",
+   fb_err:"El abogado está siendo preciso, no manipulador. Especifica la condición necesaria ('intención permanente') de 'robar' para argumentar que su cliente no la satisface. Eso es uso legítimo de definiciones."}
+];
+
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,matchSel:null,matchPairs:[]};
+
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim();
+  const m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}
+  if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){
+  const r=document.getElementById('levels-row');r.innerHTML='';
+  LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)});
+}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.matchSel=null;S.matchPairs=[];
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({ambclass:renderAmbClass,mcq:renderMCQ,tf:renderTF,match:renderMatch})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+
+/* AMBIGUITY CLASSIFIER */
+function renderAmbClass(lvl,body){
+  let html=`<div class="q-stem">${lvl.stem}</div>`;
+  lvl.items.forEach((item,i)=>{
+    html+=`<div class="amb-sentence">${item.text} <span style="font-size:.75rem;color:var(--muted)">— ${item.hint}</span></div>
+    <div class="amb-choices" style="margin-bottom:18px">
+      <button class="amb-btn" data-idx="${i}" data-val="AMB" onclick="answerAmb(this,${i})">🔀 Ambigüedad</button>
+      <button class="amb-btn" data-idx="${i}" data-val="VAG" onclick="answerAmb(this,${i})">≈ Vaguedad</button>
+    </div>`;
+  });
+  html+=`<button class="btn btn-full btn-teal" id="btn-chk-amb" onclick="checkAmb()">Verificar todo ✓</button>`;
+  body.innerHTML=html;
+  body._answers={};
+}
+function answerAmb(btn,idx){
+  if(S.answered)return;
+  document.querySelectorAll(`.amb-btn[data-idx="${idx}"]`).forEach(b=>b.classList.remove('selected-amb'));
+  btn.style.borderColor='var(--a1)';btn.style.background='rgba(199,125,255,.1)';
+  document.querySelectorAll(`.amb-btn[data-idx="${idx}"]`).forEach(b=>{if(b!==btn){b.style.borderColor='';b.style.background=''}});
+  const body=document.getElementById('q-body');
+  if(!body._answers)body._answers={};
+  body._answers[idx]=btn.dataset.val;
+}
+function checkAmb(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];
+  const body=document.getElementById('q-body');
+  const answers=body._answers||{};
+  let ok=true;
+  lvl.items.forEach((item,i)=>{
+    const chosen=answers[i];
+    const correct=item.correct;
+    const btns=document.querySelectorAll(`.amb-btn[data-idx="${i}"]`);
+    btns.forEach(b=>{b.disabled=true;
+      if(b.dataset.val===correct)b.classList.add('correct-a');
+      else if(b.dataset.val===chosen&&chosen!==correct)b.classList.add('wrong-a');
+    });
+    if(chosen!==correct)ok=false;
+  });
+  document.getElementById('btn-chk-amb').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* MCQ */
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* TF */
+function renderTF(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Verdadero</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Falso</button></div>`;
+}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+/* MATCH */
+function renderMatch(lvl,body){
+  const rights=[...lvl.pairs.map(p=>p.right)].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="match-grid">
+    <div><div class="match-col-title">Término</div><div id="lefts" style="display:grid;gap:8px"></div></div>
+    <div><div class="match-col-title">Descripción</div><div id="rights" style="display:grid;gap:8px"></div></div>
+  </div>
+  <div class="match-score" id="mscore">0 / ${lvl.pairs.length} emparejados</div>`;
+  const leftsEl=body.querySelector('#lefts');
+  lvl.pairs.forEach((p,i)=>{const d=document.createElement('div');d.className='match-item';d.dataset.li=i;d.textContent=p.left;d.onclick=()=>matchLeft(d,i);leftsEl.appendChild(d)});
+  const rightsEl=body.querySelector('#rights');
+  rights.forEach((r,i)=>{const d=document.createElement('div');d.className='match-item';d.dataset.ri=i;d.dataset.val=r;d.textContent=r;d.onclick=()=>matchRight(d);rightsEl.appendChild(d)});
+}
+function matchLeft(el,idx){
+  if(el.classList.contains('correct-m')||S.answered)return;
+  document.querySelectorAll('.match-item[data-li]').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');S.matchSel={type:'left',idx,el};
+  if(S.matchSel.rEl)doMatch();
+}
+function matchRight(el){
+  if(el.classList.contains('correct-m')||el.classList.contains('used')||S.answered)return;
+  if(!S.matchSel||S.matchSel.type==='right'){
+    document.querySelectorAll('.match-item[data-ri]').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');if(!S.matchSel)S.matchSel={};S.matchSel.rEl=el;S.matchSel.type='right';return;
+  }
+  S.matchSel.rEl=el;doMatch();
+}
+function doMatch(){
+  const{idx,el,rEl}=S.matchSel;if(!el||!rEl)return;
+  const lvl=LEVELS[S.cur];const correct=lvl.pairs[idx].right;
+  if(rEl.dataset.val===correct){
+    el.classList.add('correct-m');rEl.classList.add('correct-m');S.matchPairs.push(idx);
+    const sc=S.matchPairs.length;document.getElementById('mscore').textContent=`${sc} / ${lvl.pairs.length} emparejados`;
+    if(sc===lvl.pairs.length){clearInterval(S.timer);S.answered=true;earnXP(lvl);document.getElementById('btn-next').classList.remove('hidden');}
+  }else{
+    el.classList.add('wrong-m');rEl.classList.add('wrong-m');
+    setTimeout(()=>{el.classList.remove('wrong-m','selected');rEl.classList.remove('wrong-m','selected')},700);
+  }
+  S.matchSel=null;
+}
+
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;
+  const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}
+    if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}
+  },1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;
+  const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  document.querySelectorAll('.amb-btn,.match-item').forEach(b=>b.disabled=true);
+  ['btn-chk-amb'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+function earnXP(lvl){const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;document.getElementById('st'+S.cur).classList.add('lit');document.getElementById('xp-display').textContent=S.xp+' XP';showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP ⚡</em>`:''))}
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='¡Actividad completada!',sub='Repasa la ambigüedad y la vaguedad.';
+  if(pct>=83){trophy='🏆';title='¡Maestro de la precisión!';sub='Defines con exactitud. ¡A la Semana 9!';}
+  else if(pct>=60){trophy='🥈';title='¡Buen trabajo!';sub='Practica más con las condiciones necesarias y suficientes.';}
+  document.getElementById('result-trophy').textContent=trophy;document.getElementById('result-title').textContent=title;document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;document.getElementById('r-xp').textContent=S.xp;document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');
+  btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:8,tema:"Lógica y Definición — Precisión Conceptual",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado guardado','ok');lbl.textContent='✓ Guardado';}
+  catch(e){showToast('❌ Error al guardar','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>

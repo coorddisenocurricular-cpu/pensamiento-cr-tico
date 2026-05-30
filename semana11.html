@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 11 — Pensamiento Hipotético y Abductivo | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Cutive+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#06040f;--surface:#100c22;--card:#160f2e;--border:#241a48;
+    --a1:#e0aaff;--a2:#9d4edd;--a3:#c77dff;--gold:#ffd166;
+    --cyan:#48cae4;--green:#52b788;--red:#e63946;
+    --text:#f0e6ff;--muted:#4a3870;--radius:14px;
+    --glow:0 0 28px rgba(224,170,255,.25);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 60% at 50% -10%,rgba(157,78,221,.12) 0%,transparent 55%),
+               radial-gradient(ellipse 50% 40% at 85% 80%,rgba(72,202,228,.06) 0%,transparent 50%);
+    pointer-events:none}
+  /* star-field dots */
+  body::after{content:'';position:fixed;inset:0;z-index:0;opacity:.4;
+    background-image:radial-gradient(1px 1px at 20% 30%,rgba(224,170,255,.6) 0%,transparent 100%),
+      radial-gradient(1px 1px at 60% 15%,rgba(255,255,255,.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 80% 60%,rgba(72,202,228,.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 40% 70%,rgba(255,255,255,.3) 0%,transparent 100%),
+      radial-gradient(1px 1px at 10% 80%,rgba(224,170,255,.5) 0%,transparent 100%);
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:36px 0 24px}
+  .badge{display:inline-block;background:rgba(224,170,255,.1);border:1px solid rgba(224,170,255,.25);color:var(--a1);font-family:'Cutive Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;letter-spacing:.06em;line-height:1.2;margin-bottom:10px;
+    background:linear-gradient(135deg,#fff 10%,var(--a1) 50%,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header p{color:var(--muted);font-size:.9rem}
+
+  /* inference types strip */
+  .inf-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:26px}
+  .inf-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+  .inf-card h3{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;letter-spacing:.06em;margin-bottom:6px}
+  .inf-card.ded h3{color:var(--a1)}.inf-card.ind h3{color:var(--gold)}.inf-card.abd h3{color:var(--cyan)}
+  .inf-card p{font-size:.74rem;color:var(--muted);line-height:1.5}
+  .inf-card .example{font-style:italic;font-size:.72rem;color:var(--text);margin-top:5px}
+
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Lato',sans-serif;font-size:.82rem;font-weight:700;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--a2);color:#fff;box-shadow:var(--glow)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Lato',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(224,170,255,.1)}
+  .form-group input::placeholder{color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--a2);color:#fff;border:none;border-radius:9px;font-family:'Lato',sans-serif;font-size:.92rem;font-weight:700;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:none}
+  .btn-gold{background:var(--gold);color:#06040f}
+  .btn-cyan{background:var(--cyan);color:#06040f}
+
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'Cutive Mono',monospace;font-size:1.1rem;color:var(--gold);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Cutive Mono',monospace;font-size:.75rem;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--a1);background:rgba(224,170,255,.1);color:var(--a1);box-shadow:0 0 16px rgba(224,170,255,.3);transform:scale(1.1)}
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--a2),var(--a1),var(--cyan));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--a1);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'Cutive Mono',monospace;font-size:.88rem;color:var(--a1);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+
+  .q-tag{font-family:'Cutive Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);margin-bottom:10px}
+  .q-stem{font-size:1rem;font-weight:400;line-height:1.72;margin-bottom:22px}
+  .q-stem strong{color:var(--gold);font-weight:700}
+  .q-stem em{color:var(--a1);font-style:italic}
+  .mono{font-family:'Cutive Mono',monospace;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:.88em;color:var(--a1)}
+
+  /* MYSTERY BOX */
+  .mystery-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+  .mystery-box .mb-title{font-family:'Cinzel',serif;font-size:.8rem;color:var(--cyan);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase}
+  .mystery-box .mb-obs{font-size:.92rem;line-height:1.65;color:var(--text)}
+
+  /* MCQ */
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(224,170,255,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Cutive Mono',monospace;font-size:.75rem;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(82,183,136,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#06040f}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+
+  /* TF */
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Lato',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+  .tf-chip:hover:not(:disabled){border-color:var(--a1);background:rgba(224,170,255,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+
+  /* HYPOTHESIS RANK */
+  .hyp-list{display:grid;gap:8px;margin-bottom:14px}
+  .hyp-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:grab;display:flex;align-items:flex-start;gap:12px;font-size:.9rem;line-height:1.55;transition:all .2s;user-select:none}
+  .hyp-item:active{cursor:grabbing}
+  .hyp-item.dragging{opacity:.45;transform:scale(.97)}
+  .hyp-item.drag-over{border-color:var(--a1);background:rgba(224,170,255,.07)}
+  .drag-handle{color:var(--muted);font-size:1rem;flex-shrink:0;margin-top:2px}
+  .hyp-rank{font-family:'Cutive Mono',monospace;font-size:.72rem;color:var(--a1);min-width:22px;flex-shrink:0;margin-top:2px}
+
+  /* INFERENCE TYPE PICKER */
+  .inf-picker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+  .inf-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s}
+  .inf-btn:hover:not(:disabled){transform:translateY(-2px)}
+  .inf-btn .ib-name{font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;letter-spacing:.04em;margin-bottom:4px}
+  .inf-btn .ib-sym{font-family:'Cutive Mono',monospace;font-size:.78rem;color:var(--muted);line-height:1.4}
+  .inf-btn.ded-btn{} .inf-btn.ded-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(224,170,255,.07)} .inf-btn.ded-btn .ib-name{color:var(--a1)}
+  .inf-btn.ind-btn{} .inf-btn.ind-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(255,209,102,.07)} .inf-btn.ind-btn .ib-name{color:var(--gold)}
+  .inf-btn.abd-btn{} .inf-btn.abd-btn:hover:not(:disabled){border-color:var(--cyan);background:rgba(72,202,228,.07)} .inf-btn.abd-btn .ib-name{color:var(--cyan)}
+  .inf-btn.correct-ib{border-color:var(--green)!important;background:rgba(82,183,136,.08)!important}
+  .inf-btn.wrong-ib{border-color:var(--red)!important;background:rgba(230,57,70,.07)!important;opacity:.65}
+  .inf-btn:disabled{pointer-events:none}
+
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(82,183,136,.09);border:1px solid rgba(82,183,136,.25);color:var(--green)}
+  .feedback.err{background:rgba(230,57,70,.07);border:1px solid rgba(230,57,70,.2);color:var(--red)}
+
+  .section-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .result-trophy{font-size:4rem;text-align:center;margin:10px 0 16px}
+  .result-title{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;letter-spacing:.04em;text-align:center;margin-bottom:8px}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.92rem}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'Cutive Mono',monospace;font-size:1.5rem;color:var(--a1)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){.card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}.tab-btn{font-size:.72rem;padding:9px 4px}.inf-strip{grid-template-columns:1fr}.inf-picker{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">✦ Semana 11 · Pensamiento Crítico · UVP</div>
+    <h1>Pensamiento<br>Hipotético y Abductivo</h1>
+    <p>Más allá de la deducción · Inferencia a la mejor explicación</p>
+  </div>
+
+  <div class="inf-strip">
+    <div class="inf-card ded">
+      <h3>Deducción</h3>
+      <p>De premisas ciertas → conclusión <strong>necesaria</strong>. Certeza garantizada.</p>
+      <div class="example">«Todos los A son B. X es A. ∴ X es B.»</div>
+    </div>
+    <div class="inf-card ind">
+      <h3>Inducción</h3>
+      <p>De casos observados → conclusión <strong>probable</strong>. Generalización.</p>
+      <div class="example">«Todos los cisnes que vi son blancos → Todos los cisnes son blancos.»</div>
+    </div>
+    <div class="inf-card abd">
+      <h3>Abducción</h3>
+      <p>De efecto observado → <strong>mejor explicación</strong>. Hipótesis más plausible.</p>
+      <div class="example">«El suelo está mojado → Llovió (la mejor explicación).»</div>
+    </div>
+  </div>
+
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Ej. Natalia Bravo Santos"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">Comenzar actividad →</button>
+  </div>
+
+  <div id="screen-game" class="hidden">
+    <div class="xp-row"><span style="font-size:1.3rem">⚡</span><div class="xp-label">XP acumulados</div><div class="xp-val" id="xp-display">0 XP</div></div>
+    <div class="streak-row"><span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span><span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span><span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span></div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div><div class="timer-num" id="timer-num">30</div></div>
+      <div class="q-tag" id="q-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">¡Completado!</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">Guardar resultado</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+const LEVELS=[
+  {id:1,tag:"Nivel 1 — Identifica el tipo de inferencia",xp:50,time:28,type:"infpicker",
+   stem:"«He observado 500 cuervos y todos son negros. Por lo tanto, <em>probablemente</em> todos los cuervos son negros.»<br><br>¿Qué tipo de inferencia es esta?",
+   correct:"IND",
+   fb_ok:"✅ Inducción. A partir de casos observados (500 cuervos negros) se generaliza una conclusión probable. La certeza no está garantizada: podría existir un cuervo blanco.",
+   fb_err:"Es Inducción: generalización a partir de casos observados. No garantiza certeza (podría aparecer un cisne negro). La deducción garantiza; la abducción busca la mejor explicación."},
+
+  {id:2,tag:"Nivel 2 — Abducción en contexto",xp:75,time:28,type:"mcq",
+   stem:"Un detective llega a la escena y observa: <em>«La cerradura está forzada, falta una laptop, hay huellas de barro fresco y el vecino vio una furgoneta blanca.»</em><br><br>El detective concluye: <em>«Lo más probable es que ocurrió un robo premeditado.»</em><br><br>¿Qué tipo de razonamiento usa?",
+   opts:["Deducción: parte de leyes ciertas para concluir con certeza.","Inducción: generaliza a partir de muchos casos similares.","Abducción: infiere la mejor explicación para los hechos observados.","Silogismo hipotético: encadena dos condicionales."],
+   correct:2,
+   fb_ok:"✅ Abducción (inferencia a la mejor explicación). El detective no tiene certeza, pero elige la hipótesis más plausible que explica todos los indicios. Es el razonamiento central del método científico y el diagnóstico.",
+   fb_err:"Es Abducción: dados los hechos observados, se infiere la hipótesis que mejor los explica. No hay certeza deductiva ni generalización inductiva, sino la mejor explicación disponible."},
+
+  {id:3,tag:"Nivel 3 — Verdadero o Falso",xp:80,time:25,type:"tf",
+   stem:"Afirmación: <em>«En la abducción, la conclusión es <strong>necesariamente verdadera</strong> si los hechos observados son correctos.»</em>",
+   correct:false,
+   fb_ok:"✅ Falso. La abducción produce la hipótesis MÁS PLAUSIBLE, no una conclusión necesaria. Siempre existe la posibilidad de que haya una mejor explicación aún no considerada.",
+   fb_err:"Es Falso. La abducción no garantiza certeza. Produce la mejor explicación disponible. Los mismos hechos pueden tener múltiples explicaciones posibles; la abducción elige la más razonable."},
+
+  {id:4,tag:"Nivel 4 — Ranking de hipótesis",xp:110,time:40,type:"rank",
+   stem:"Observación: <em>«Juan llegó tarde al trabajo, tiene la ropa mojada y un paraguas en la mano.»</em><br><br><strong>Ordena</strong> las siguientes hipótesis de <em>más plausible</em> (1) a <em>menos plausible</em> (4) según el Principio de la Mejor Explicación:",
+   items:[
+     {text:"Llovió y Juan caminó bajo la lluvia.",order:1},
+     {text:"Juan se mojó porque cruzó un río.",order:3},
+     {text:"El sistema de sprinklers del edificio se activó.",order:4},
+     {text:"Juan salió sin impermeabilizante y lo sorprendió la lluvia.",order:2},
+   ],
+   fb_ok:"✅ ¡Correcto! La mejor explicación es la más simple y coherente con todos los indicios. El paraguas + ropa mojada + lluvia apunta a llover primero como hipótesis dominante.",
+   fb_err:"Mejor a peor: 1) Llovió y caminó (todos los indicios lo apoyan), 2) Salió sin impermeabilizante (ligeramente diferente), 3) Cruzó un río (poco probable con paraguas), 4) Sprinklers (muy improbable)."},
+
+  {id:5,tag:"Nivel 5 — Formulación de hipótesis",xp:150,time:35,type:"mcq",
+   stem:"Un científico nota que <em>«las plantas de su laboratorio cercanas a la ventana crecen más rápido que las que están lejos»</em>.<br><br>¿Cuál es la <strong>hipótesis abductiva más precisa</strong> que puede formular?",
+   opts:[
+     "«Las plantas cerca de la ventana son mejores plantas.»",
+     "«La luz solar que entra por la ventana acelera el crecimiento de las plantas.»",
+     "«Todas las plantas del mundo crecen hacia las ventanas.»",
+     "«Las plantas lejos de la ventana tienen una enfermedad desconocida.»"
+   ],
+   correct:1,
+   fb_ok:"✅ Exacto. La hipótesis abductiva correcta identifica el factor causal más plausible (la luz solar) que explica directamente el fenómeno observado. Es específica, falsable y coherente con los hechos.",
+   fb_err:"La mejor hipótesis abductiva debe ser específica, falsable y directamente conectada a los hechos. «La luz solar acelera el crecimiento» cumple esos criterios. Las otras son vagas, generalizaciones o suposiciones sin base."},
+
+  {id:6,tag:"Nivel 6 — Deducción vs Abducción",xp:200,time:32,type:"mcq",
+   stem:"Compara estos dos razonamientos:<br><br><strong>A)</strong> <em>«Si llueve, el suelo se moja. Llovió. ∴ El suelo está mojado.»</em><br><strong>B)</strong> <em>«El suelo está mojado. La mejor explicación es que llovió. ∴ Probablemente llovió.»</em><br><br>¿Cuál es la diferencia fundamental?",
+   opts:[
+     "A y B son el mismo tipo de razonamiento expresado de forma diferente.",
+     "A va de causa a efecto (deducción); B va de efecto a causa probable (abducción).",
+     "A es un silogismo disyuntivo; B es un Modus Tollens.",
+     "B es más confiable que A porque parte de evidencia observable."
+   ],
+   correct:1,
+   fb_ok:"✅ Perfecto. A es deducción: de la causa (lluvia) a un efecto necesario (suelo mojado). B es abducción: del efecto observado (suelo mojado) a la causa más probable (lluvia). La dirección de la inferencia es opuesta.",
+   fb_err:"La diferencia clave es la dirección: deducción va de premisas a conclusión necesaria (causa→efecto); abducción va de efecto observado a mejor hipótesis causal. B no es más confiable, es menos: produce probabilidad, no certeza."}
+];
+
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,orderDrag:null};
+
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim(),m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){
+  const r=document.getElementById('levels-row');r.innerHTML='';
+  LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)});
+}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.orderDrag=null;
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({infpicker:renderInfPicker,mcq:renderMCQ,tf:renderTF,rank:renderRank})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+
+function renderInfPicker(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <div class="inf-picker">
+    <button class="inf-btn ded-btn" onclick="answerInf('DED',this)">
+      <div class="ib-name">Deducción</div>
+      <div class="ib-sym">Certeza<br>garantizada</div>
+    </button>
+    <button class="inf-btn ind-btn" onclick="answerInf('IND',this)">
+      <div class="ib-name">Inducción</div>
+      <div class="ib-sym">Generalización<br>probable</div>
+    </button>
+    <button class="inf-btn abd-btn" onclick="answerInf('ABD',this)">
+      <div class="ib-name">Abducción</div>
+      <div class="ib-sym">Mejor<br>explicación</div>
+    </button>
+  </div>`;
+}
+function answerInf(val,btn){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  document.querySelectorAll('.inf-btn').forEach(b=>b.disabled=true);
+  const correctMap={DED:0,IND:1,ABD:2};
+  document.querySelectorAll('.inf-btn')[correctMap[lvl.correct]].classList.add('correct-ib');
+  if(!ok)btn.classList.add('wrong-ib');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderMCQ(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderTF(lvl,body){
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ Verdadero</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ Falso</button></div>`;
+}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderRank(lvl,body){
+  const shuffled=[...lvl.items].sort(()=>Math.random()-.5);
+  body.innerHTML=`<div class="q-stem">${lvl.stem}</div>
+  <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Arrastra o toca para reordenar. #1 = más plausible.</p>
+  <div class="hyp-list" id="hlist"></div>
+  <button class="btn btn-full btn-cyan" id="btn-chk" onclick="checkRank()">Verificar ranking ✓</button>`;
+  const list=body.querySelector('#hlist');
+  shuffled.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='hyp-item';d.dataset.order=item.order;d.draggable=true;
+    d.innerHTML=`<span class="drag-handle">⠿</span><span class="hyp-rank">#${i+1}</span><span>${item.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDrag=d;d.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    d.addEventListener('dragend',()=>{d.classList.remove('dragging');S.orderDrag=null});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('drag-over')});
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over'));
+    d.addEventListener('drop',e=>{
+      e.preventDefault();d.classList.remove('drag-over');
+      if(S.orderDrag&&S.orderDrag!==d){
+        const its=[...list.children];const a=its.indexOf(S.orderDrag),b=its.indexOf(d);
+        if(a<b)list.insertBefore(S.orderDrag,d.nextSibling);else list.insertBefore(S.orderDrag,d);
+        [...list.children].forEach((el,i)=>el.querySelector('.hyp-rank').textContent='#'+(i+1));
+      }
+    });
+    list.appendChild(d);
+  });
+}
+function checkRank(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const list=document.getElementById('hlist');let ok=true;
+  [...list.children].forEach((el,i)=>{const c=parseInt(el.dataset.order)===i+1;if(!c)ok=false;el.style.borderColor=c?'var(--green)':'var(--red)';el.style.background=c?'rgba(82,183,136,.07)':'rgba(230,57,70,.07)'});
+  document.getElementById('btn-chk').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;
+  const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}
+    if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}
+  },1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;
+  const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  document.querySelectorAll('.inf-btn').forEach(b=>b.disabled=true);
+  ['btn-chk'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+function earnXP(lvl){const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;document.getElementById('st'+S.cur).classList.add('lit');document.getElementById('xp-display').textContent=S.xp+' XP';showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP ⚡</em>`:'')); }
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='¡Completado!',sub='Repasa la diferencia entre deducción, inducción y abducción.';
+  if(pct>=83){trophy='🏆';title='¡Razonador experto!';sub='Dominas los tres tipos de inferencia. ¡A la Semana 12!';}
+  else if(pct>=60){trophy='🥈';title='¡Buen trabajo!';sub='Practica más con la abducción y el ranking de hipótesis.';}
+  document.getElementById('result-trophy').textContent=trophy;document.getElementById('result-title').textContent=title;document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;document.getElementById('r-xp').textContent=S.xp;document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');
+  btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:11,tema:"Pensamiento Hipotético y Abductivo",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado guardado','ok');lbl.textContent='✓ Guardado';}
+  catch(e){showToast('❌ Error','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>

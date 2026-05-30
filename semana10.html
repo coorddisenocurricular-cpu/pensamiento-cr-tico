@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 10 — Lógica en las Disciplinas | Pensamiento Crítico</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#020b0f;--surface:#061520;--card:#0a2030;--border:#0f3248;
+    --a1:#00b4d8;--a2:#90e0ef;--a3:#48cae4;--gold:#ffd166;
+    --green:#52b788;--red:#e63946;--orange:#fb8500;--purple:#c77dff;
+    --text:#caf0f8;--muted:#1e5f7a;--radius:14px;
+    --glow:0 0 28px rgba(0,180,216,.28);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(0,180,216,.1) 0%,transparent 55%),
+               radial-gradient(ellipse 40% 35% at 85% 90%,rgba(144,224,239,.05) 0%,transparent 50%);
+    pointer-events:none}
+  /* scanlines */
+  body::after{content:'';position:fixed;inset:0;z-index:0;opacity:.04;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,180,216,.5) 2px,rgba(0,180,216,.5) 3px);
+    pointer-events:none}
+  #app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:36px 0 24px}
+  .badge{display:inline-block;background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.28);color:var(--a1);font-family:'Roboto Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+  .header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:.08em;line-height:1.05;margin-bottom:10px;
+    background:linear-gradient(135deg,#fff 10%,var(--a1) 50%,var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header p{color:var(--muted);font-size:.9rem}
+
+  /* discipline tabs */
+  .disc-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:26px}
+  .disc-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+  .disc-card .icon{font-size:1.6rem;margin-bottom:6px}
+  .disc-card h3{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .disc-card.eng h3{color:var(--a1)} .disc-card.law h3{color:var(--orange)} .disc-card.med h3{color:var(--green)}
+  .disc-card p{font-size:.75rem;color:var(--muted);line-height:1.45}
+
+  .tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:24px}
+  .tab-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Exo 2',sans-serif;font-size:.82rem;font-weight:600;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .2s}
+  .tab-btn:hover{color:var(--text);background:var(--border)}
+  .tab-btn.active{background:var(--a1);color:#020b0f;box-shadow:var(--glow)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.74rem;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .form-group input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.98rem;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .form-group input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(0,180,216,.12)}
+  .form-group input::placeholder{color:var(--muted)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--a1);color:#020b0f;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.06em;padding:13px 26px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+  .btn:active{transform:translateY(0)}
+  .btn-full{width:100%;justify-content:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:none}
+  .btn-gold{background:var(--gold);color:#020b0f}
+  .btn-orange{background:var(--orange);color:#020b0f}
+
+  .xp-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .xp-val{font-family:'Roboto Mono',monospace;font-size:1.1rem;color:var(--gold);margin-left:auto}
+  .xp-label{font-size:.78rem;color:var(--muted)}
+  .streak-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .streak-star{font-size:1.4rem;filter:grayscale(1) opacity(.3);transition:filter .4s,transform .4s}
+  .streak-star.lit{filter:none;transform:scale(1.2)}
+  .levels-row{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+  .level-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace;font-size:.75rem;color:var(--muted);transition:all .3s}
+  .level-dot.done{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .level-dot.active{border-color:var(--a1);background:rgba(0,180,216,.12);color:var(--a1);box-shadow:0 0 16px rgba(0,180,216,.35);transform:scale(1.1)}
+  .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:100px;height:8px;margin-bottom:10px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a3),var(--a2));border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:28px}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .timer-bar-bg{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+  .timer-bar-fill{height:100%;background:var(--a1);border-radius:100px;transition:width .9s linear,background .3s}
+  .timer-bar-fill.danger{background:var(--red)}
+  .timer-num{font-family:'Roboto Mono',monospace;font-size:.88rem;color:var(--a1);min-width:28px;text-align:right}
+  .timer-num.danger{color:var(--red)}
+
+  .q-tag{font-family:'Roboto Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);margin-bottom:10px}
+  .q-stem{font-size:1rem;font-weight:400;line-height:1.7;margin-bottom:22px}
+  .q-stem strong{color:var(--gold);font-weight:600}
+  .q-stem em{color:var(--a2);font-style:italic}
+  .mono{font-family:'Roboto Mono',monospace;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:.88em;color:var(--a1)}
+  .disc-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+  .disc-tag.eng{background:rgba(0,180,216,.12);color:var(--a1);border:1px solid rgba(0,180,216,.25)}
+  .disc-tag.law{background:rgba(251,133,0,.1);color:var(--orange);border:1px solid rgba(251,133,0,.25)}
+  .disc-tag.med{background:rgba(82,183,136,.1);color:var(--green);border:1px solid rgba(82,183,136,.25)}
+  .disc-tag.multi{background:rgba(199,125,255,.1);color:var(--purple);border:1px solid rgba(199,125,255,.25)}
+
+  /* CASE BOX */
+  .case-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px;font-size:.94rem;line-height:1.7}
+  .case-box .case-title{font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+
+  /* MCQ */
+  .options{display:grid;gap:10px}
+  .opt-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.92rem;padding:13px 16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+  .opt-btn:hover:not(:disabled){border-color:var(--a1);background:rgba(0,180,216,.06);transform:translateX(4px)}
+  .opt-letter{min-width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace;font-size:.75rem;color:var(--muted);flex-shrink:0}
+  .opt-btn.correct{border-color:var(--green);background:rgba(82,183,136,.07)}
+  .opt-btn.correct .opt-letter{background:var(--green);color:#020b0f}
+  .opt-btn.wrong{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .opt-btn.wrong .opt-letter{background:var(--red);color:#fff}
+  .opt-btn:disabled{pointer-events:none}
+
+  /* TF */
+  .tf-row{display:flex;gap:12px}
+  .tf-chip{flex:1;padding:16px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;letter-spacing:.04em}
+  .tf-chip:hover:not(:disabled){border-color:var(--a1);background:rgba(0,180,216,.07)}
+  .tf-chip.correct-chip{border-color:var(--green);background:rgba(82,183,136,.1);color:var(--green)}
+  .tf-chip.wrong-chip{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.65}
+  .tf-chip:disabled{pointer-events:none}
+
+  /* MATCH DISCIPLINES */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+  .match-col-title{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:8px}
+  .match-item{background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;font-size:.86rem;text-align:center;cursor:pointer;transition:all .2s;min-height:54px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+  .match-item:hover:not(.used):not(.correct-m){border-color:var(--a1);background:rgba(0,180,216,.07)}
+  .match-item.selected{border-color:var(--gold);background:rgba(255,209,102,.08);color:var(--gold)}
+  .match-item.correct-m{border-color:var(--green);background:rgba(82,183,136,.08);color:var(--green);pointer-events:none}
+  .match-item.wrong-m{border-color:var(--red);background:rgba(230,57,70,.07);color:var(--red)}
+  .match-item.used{opacity:.3;pointer-events:none}
+  .match-score{font-family:'Roboto Mono',monospace;font-size:.8rem;color:var(--muted);text-align:right;margin-top:6px}
+
+  /* DRAG */
+  .sort-list{display:grid;gap:8px;margin-bottom:14px}
+  .sort-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;cursor:grab;display:flex;align-items:flex-start;gap:12px;font-size:.9rem;line-height:1.5;transition:all .2s;user-select:none}
+  .sort-item:active{cursor:grabbing}
+  .sort-item.dragging{opacity:.45;transform:scale(.97)}
+  .sort-item.drag-over{border-color:var(--a1);background:rgba(0,180,216,.07)}
+  .drag-handle{color:var(--muted);font-size:1rem;flex-shrink:0;margin-top:2px}
+  .step-num{font-family:'Roboto Mono',monospace;font-size:.72rem;color:var(--a1);min-width:22px;flex-shrink:0;margin-top:2px}
+
+  /* FLOWCHART PICKER */
+  .flow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .flow-opt{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+  .flow-opt:hover:not(:disabled){border-color:var(--a1);background:rgba(0,180,216,.07)}
+  .flow-opt .fo-sym{font-family:'Roboto Mono',monospace;font-size:1.1rem;color:var(--a1);margin-bottom:6px}
+  .flow-opt .fo-label{font-size:.85rem;color:var(--text);font-weight:500}
+  .flow-opt .fo-desc{font-size:.75rem;color:var(--muted);margin-top:4px;line-height:1.4}
+  .flow-opt.correct-fo{border-color:var(--green);background:rgba(82,183,136,.07)}
+  .flow-opt.correct-fo .fo-sym{color:var(--green)}
+  .flow-opt.wrong-fo{border-color:var(--red);background:rgba(230,57,70,.07);opacity:.7}
+  .flow-opt:disabled{pointer-events:none}
+
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:.9rem;line-height:1.6;display:none;animation:fadeUp .3s ease}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(82,183,136,.09);border:1px solid rgba(82,183,136,.25);color:var(--green)}
+  .feedback.err{background:rgba(230,57,70,.07);border:1px solid rgba(230,57,70,.2);color:var(--red)}
+
+  .section-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .result-trophy{font-size:4rem;text-align:center;margin:10px 0 16px}
+  .result-title{font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:.06em;text-align:center;margin-bottom:8px}
+  .result-sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.92rem}
+  .result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center}
+  .stat-box .sv{font-family:'Roboto Mono',monospace;font-size:1.5rem;color:var(--a1)}
+  .stat-box .sl{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(2,11,15,.3);border-top-color:#020b0f;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.88rem;z-index:9999;animation:slideIn .3s ease;max-width:300px}
+  .toast.ok{border-color:var(--green)}.toast.err{border-color:var(--red)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:520px){.card{padding:22px 16px}.result-stats{grid-template-columns:1fr 1fr}.tab-btn{font-size:.72rem;padding:9px 4px}.disc-strip{grid-template-columns:1fr}.flow-grid{grid-template-columns:1fr}.match-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="badge">⚙ Semana 10 · Pensamiento Crítico · UVP</div>
+    <h1>LA LÓGICA EN<br>LAS DISCIPLINAS</h1>
+    <p>Ingeniería · Derecho · Salud — Estudios de caso</p>
+  </div>
+
+  <div class="disc-strip">
+    <div class="disc-card eng"><div class="icon">⚙️</div><h3>Ingeniería</h3><p>Diagramas de flujo y lógica de sistemas</p></div>
+    <div class="disc-card law"><div class="icon">⚖️</div><h3>Derecho</h3><p>Silogismo jurídico y prueba de hechos</p></div>
+    <div class="disc-card med"><div class="icon">🩺</div><h3>Salud</h3><p>Razonamiento diagnóstico</p></div>
+  </div>
+
+  <div id="screen-login" class="card">
+    <div class="section-title">🎓 Identifícate</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-plantel="Puebla"   onclick="selectPlantel(this)">Puebla</button>
+      <button class="tab-btn"        data-plantel="Tehuacán" onclick="selectPlantel(this)">Tehuacán</button>
+      <button class="tab-btn"        data-plantel="Tlaxcala" onclick="selectPlantel(this)">Tlaxcala</button>
+    </div>
+    <div class="form-group"><label>Nombre completo</label><input type="text" id="inp-nombre" placeholder="Ej. Rodrigo Castillo Vega"/></div>
+    <div class="form-group"><label>Matrícula</label><input type="text" id="inp-matricula" placeholder="Ej. 2023001234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" maxlength="12"/></div>
+    <button class="btn btn-full" onclick="startGame()">INICIAR MISIÓN →</button>
+  </div>
+
+  <div id="screen-game" class="hidden">
+    <div class="xp-row"><span style="font-size:1.3rem">⚡</span><div class="xp-label">XP acumulados</div><div class="xp-val" id="xp-display">0 XP</div></div>
+    <div class="streak-row"><span class="streak-star" id="st0">⭐</span><span class="streak-star" id="st1">⭐</span><span class="streak-star" id="st2">⭐</span><span class="streak-star" id="st3">⭐</span><span class="streak-star" id="st4">⭐</span><span class="streak-star" id="st5">⭐</span></div>
+    <div class="levels-row" id="levels-row"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Nivel 1 de 6</span><span id="prog-pct">0%</span></div>
+    <div class="card" id="q-card">
+      <div class="timer-wrap"><div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div><div class="timer-num" id="timer-num">30</div></div>
+      <div class="q-tag" id="q-tag">Nivel 1</div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-full hidden" id="btn-next" onclick="nextLevel()" style="margin-top:18px">SIGUIENTE NIVEL →</button>
+    </div>
+  </div>
+
+  <div id="screen-result" class="hidden card">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">COMPLETADO</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="sv" id="r-correct">0</div><div class="sl">Correctas</div></div>
+      <div class="stat-box"><div class="sv" id="r-xp">0</div><div class="sl">XP ganados</div></div>
+      <div class="stat-box"><div class="sv" id="r-time">0s</div><div class="sl">Tiempo</div></div>
+    </div>
+    <button class="btn btn-full btn-gold" id="btn-save" onclick="saveResult()"><span id="save-label">GUARDAR RESULTADO</span></button>
+    <div style="height:10px"></div>
+    <button class="btn btn-full btn-outline" onclick="resetAll()">Reintentar actividad</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzHrcAlYOVJ66BjFZygT6d2pG8kWdWjRsSSl06ESe3_qa4__yf1e98CVGor0cip2Yql/exec";
+
+const LEVELS=[
+  {id:1,tag:"Nivel 1 — Ingeniería ⚙️",xp:50,time:28,type:"mcq",disc:"eng",
+   stem:"En un diagrama de flujo, un <strong>rombo</strong> representa…",
+   opts:["Una operación o proceso","Una decisión con dos salidas (Sí/No)","El inicio o fin del algoritmo","Una entrada o salida de datos"],
+   correct:1,
+   fb_ok:"✅ Correcto. El rombo es el símbolo de decisión: evalúa una condición lógica y produce dos ramas posibles (Verdadero/Falso = Sí/No). Es la puerta lógica visual del ingeniero.",
+   fb_err:"El rombo es la decisión: evalúa una condición lógica (p → dos ramas). Rectángulo=proceso, óvalo=inicio/fin, paralelogramo=entrada/salida."},
+
+  {id:2,tag:"Nivel 2 — Derecho ⚖️",xp:75,time:30,type:"mcq",disc:"law",
+   stem:"El silogismo jurídico clásico tiene la forma:<br><em>Premisa mayor: Norma legal general<br>Premisa menor: Hecho del caso<br>∴ Conclusión: Resolución jurídica</em><br><br>En el caso: <em>«Quien cometa robo será sancionado. El acusado cometió robo. ∴ El acusado debe ser sancionado.»</em><br>¿Cuál es la <strong>premisa menor</strong>?",
+   opts:["Quien cometa robo será sancionado.","El acusado debe ser sancionado.","El acusado cometió robo.","La ley establece sanciones para el robo."],
+   correct:2,
+   fb_ok:"✅ Exacto. La premisa menor es el hecho específico del caso: «El acusado cometió robo». Conecta el caso concreto con la norma general para producir la resolución.",
+   fb_err:"La premisa menor es el hecho del caso: «El acusado cometió robo». La premisa mayor es la norma («quien cometa robo será sancionado»). La conclusión es la resolución."},
+
+  {id:3,tag:"Nivel 3 — Salud 🩺",xp:80,time:28,type:"tf",disc:"med",
+   stem:"Un médico razona: <em>«Si el paciente tiene fiebre alta, rigidez de nuca y fotofobia, entonces tiene meningitis bacteriana. Este paciente tiene fiebre alta, rigidez de nuca y fotofobia. ∴ Tiene meningitis bacteriana.»</em><br><br>¿Es este diagnóstico un <strong>Modus Ponens</strong> válido?",
+   correct:true,
+   fb_ok:"✅ Sí es Modus Ponens válido estructuralmente: p → q, p, ∴ q. Sin embargo, en medicina la premisa mayor ('si esos síntomas → meningitis') es probabilística, no absoluta. La validez formal no garantiza certeza clínica.",
+   fb_err:"Sí es Modus Ponens: p → q, p, ∴ q. La estructura es válida. El reto médico es que la premisa mayor (síntomas → diagnóstico) es probabilística, no determinística, a diferencia de la lógica formal."},
+
+  {id:4,tag:"Nivel 4 — Multi-disciplina",xp:110,time:35,type:"match",disc:"multi",
+   stem:"Empareja cada <strong>herramienta lógica</strong> con la <strong>disciplina</strong> que la usa más directamente.",
+   pairs:[
+     {left:"Diagrama de flujo",right:"Ingeniería de software"},
+     {left:"Silogismo jurídico",right:"Derecho"},
+     {left:"Razonamiento abductivo",right:"Diagnóstico médico"},
+     {left:"Tabla de decisión",right:"Administración y gestión"},
+   ],
+   fb_ok:"✅ ¡Emparejamiento correcto! Cada disciplina tiene su propia expresión de la lógica, aunque todas comparten la estructura inferencial subyacente.",
+   fb_err:"Flujo→Ingeniería, Silogismo→Derecho, Abducción→Medicina (inferencia a la mejor explicación), Tablas de decisión→Administración."},
+
+  {id:5,tag:"Nivel 5 — Diagrama de flujo",xp:150,time:38,type:"order",disc:"eng",
+   stem:"Ordena los pasos de un algoritmo de diagnóstico médico simple. <strong>Arrastra</strong> para ordenar correctamente de arriba a abajo:",
+   items:[
+     {text:"[INICIO] — Paciente llega con síntomas.",order:1},
+     {text:"¿Fiebre > 38.5°C?  [Sí→continúa | No→otro diagnóstico]",order:2},
+     {text:"¿Rigidez de nuca?  [Sí→continúa | No→revisar otras causas]",order:3},
+     {text:"Diagnóstico preliminar: posible meningitis. Ordenar punción lumbar.",order:4},
+     {text:"[FIN] — Confirmar o descartar con resultados de laboratorio.",order:5},
+   ],
+   fb_ok:"✅ ¡Orden correcto! Este flujo muestra cómo la lógica condicional anidada (Si A y Si B entonces C) estructura el diagnóstico clínico.",
+   fb_err:"El algoritmo va: inicio → primera condición (fiebre) → segunda condición (rigidez) → diagnóstico preliminar → confirmación con laboratorio."},
+
+  {id:6,tag:"Nivel 6 — Análisis jurídico",xp:200,time:32,type:"mcq",disc:"law",
+   stem:"Un abogado defensor argumenta: <em>«La ley penaliza el robo CON VIOLENCIA. Mi cliente tomó el objeto sin violencia. Por lo tanto, no aplica la sanción por robo con violencia.»</em><br><br>¿Qué estructura lógica usa el abogado?",
+   opts:[
+     "Modus Ponens: afirma la condición para afirmar la consecuencia.",
+     "Modus Tollens: niega la consecuencia para negar la condición.",
+     "Negación del antecedente para negar la sanción específica (válido en este contexto).",
+     "Silogismo Disyuntivo: elimina una opción para afirmar la otra."
+   ],
+   correct:2,
+   fb_ok:"✅ Análisis correcto. El abogado usa la estructura: p (robo con violencia) → q (sanción). ¬p (sin violencia) → argumenta ¬q. En lógica pura sería falacia de negación del antecedente, pero en derecho la norma específica define exactamente esa condición, haciendo el argumento jurídicamente válido.",
+   fb_err:"El abogado argumenta: la norma aplica SOLO cuando hay violencia (p→q). No hubo violencia (¬p). En lógica formal sería falacia de negación del antecedente, pero en derecho la norma delimita su propio alcance, lo que hace el argumento jurídicamente correcto."}
+];
+
+let S={plantel:"Puebla",nombre:"",matricula:"",cur:0,xp:0,correct:0,startTime:null,timer:null,timeLeft:30,answered:false,_tt:0,orderDrag:null,matchSel:null,matchPairs:[]};
+
+function selectPlantel(b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');S.plantel=b.dataset.plantel}
+function startGame(){
+  const n=document.getElementById('inp-nombre').value.trim(),m=document.getElementById('inp-matricula').value.trim();
+  if(!n){showToast("Escribe tu nombre","err");return}if(m.length<5){showToast("Matrícula inválida","err");return}
+  S.nombre=n;S.matricula=m;S.cur=0;S.xp=0;S.correct=0;S.startTime=Date.now();
+  show('screen-game');hide('screen-login');buildDots();loadLevel();
+}
+function buildDots(){
+  const r=document.getElementById('levels-row');r.innerHTML='';
+  LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='level-dot'+(i===0?' active':'');d.id='dot-'+i;d.textContent=i+1;r.appendChild(d)});
+}
+function loadLevel(){
+  const lvl=LEVELS[S.cur];S.answered=false;S.orderDrag=null;S.matchSel=null;S.matchPairs=[];
+  document.querySelectorAll('.level-dot').forEach((d,i)=>{d.className='level-dot'+(i<S.cur?' done':'')+(i===S.cur?' active':'');d.textContent=i<S.cur?'✓':i+1});
+  const pct=Math.round((S.cur/LEVELS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Nivel ${S.cur+1} de ${LEVELS.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('q-tag').textContent=lvl.tag;
+  const fb=document.getElementById('feedback');fb.className='feedback';fb.innerHTML='';
+  document.getElementById('btn-next').classList.add('hidden');
+  const body=document.getElementById('q-body');body.innerHTML='';
+  ({mcq:renderMCQ,tf:renderTF,match:renderMatch,order:renderOrder})[lvl.type](lvl,body);
+  startTimer(lvl.time);
+}
+
+function renderMCQ(lvl,body){
+  const dtag=`<div class="disc-tag ${lvl.disc}">${{eng:'⚙️ Ingeniería',law:'⚖️ Derecho',med:'🩺 Salud',multi:'🔬 Multi'}[lvl.disc]}</div>`;
+  body.innerHTML=`${dtag}<div class="q-stem">${lvl.stem}</div><div class="options" id="opts"></div>`;
+  ['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt-btn';b.innerHTML=`<span class="opt-letter">${l}</span><span>${lvl.opts[i]}</span>`;b.onclick=()=>answerMCQ(i,lvl);body.querySelector('#opts').appendChild(b)});
+}
+function answerMCQ(idx,lvl){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct');else if(i===idx)b.classList.add('wrong')});
+  if(idx===lvl.correct)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderTF(lvl,body){
+  const dtag=`<div class="disc-tag ${lvl.disc}">${{eng:'⚙️ Ingeniería',law:'⚖️ Derecho',med:'🩺 Salud',multi:'🔬 Multi'}[lvl.disc]}</div>`;
+  body.innerHTML=`${dtag}<div class="q-stem">${lvl.stem}</div><div class="tf-row"><button class="tf-chip" id="chip-t" onclick="answerTF(true)">✓ SÍ / VÁLIDO</button><button class="tf-chip" id="chip-f" onclick="answerTF(false)">✗ NO / INVÁLIDO</button></div>`;
+}
+function answerTF(val){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const ok=val===lvl.correct;
+  const bt=document.getElementById('chip-t'),bf=document.getElementById('chip-f');
+  bt.disabled=bf.disabled=true;(val?bt:bf).classList.add(ok?'correct-chip':'wrong-chip');
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderMatch(lvl,body){
+  const dtag=`<div class="disc-tag ${lvl.disc}">🔬 Multi-disciplina</div>`;
+  const rights=[...lvl.pairs.map(p=>p.right)].sort(()=>Math.random()-.5);
+  body.innerHTML=`${dtag}<div class="q-stem">${lvl.stem}</div>
+  <div class="match-grid">
+    <div><div class="match-col-title">Herramienta lógica</div><div id="lefts" style="display:grid;gap:8px"></div></div>
+    <div><div class="match-col-title">Disciplina</div><div id="rights" style="display:grid;gap:8px"></div></div>
+  </div>
+  <div class="match-score" id="mscore">0 / ${lvl.pairs.length}</div>`;
+  const le=body.querySelector('#lefts');
+  lvl.pairs.forEach((p,i)=>{const d=document.createElement('div');d.className='match-item';d.dataset.li=i;d.textContent=p.left;d.onclick=()=>matchLeft(d,i);le.appendChild(d)});
+  const re=body.querySelector('#rights');
+  rights.forEach((r,i)=>{const d=document.createElement('div');d.className='match-item';d.dataset.ri=i;d.dataset.val=r;d.textContent=r;d.onclick=()=>matchRight(d);re.appendChild(d)});
+}
+function matchLeft(el,idx){
+  if(el.classList.contains('correct-m')||S.answered)return;
+  document.querySelectorAll('.match-item[data-li]').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');S.matchSel={idx,el};
+}
+function matchRight(el){
+  if(el.classList.contains('correct-m')||el.classList.contains('used')||S.answered)return;
+  if(!S.matchSel){el.classList.add('selected');return}
+  const{idx,el:lEl}=S.matchSel;
+  const correct=LEVELS[S.cur].pairs[idx].right;
+  if(el.dataset.val===correct){
+    lEl.classList.add('correct-m');el.classList.add('correct-m');S.matchPairs.push(idx);
+    const sc=S.matchPairs.length;document.getElementById('mscore').textContent=`${sc} / ${LEVELS[S.cur].pairs.length}`;
+    if(sc===LEVELS[S.cur].pairs.length){clearInterval(S.timer);S.answered=true;earnXP(LEVELS[S.cur]);document.getElementById('btn-next').classList.remove('hidden')}
+  }else{
+    lEl.classList.add('wrong-m');el.classList.add('wrong-m');
+    setTimeout(()=>{lEl.classList.remove('wrong-m','selected');el.classList.remove('wrong-m','selected')},700);
+  }
+  S.matchSel=null;
+}
+
+function renderOrder(lvl,body){
+  const dtag=`<div class="disc-tag ${lvl.disc}">${{eng:'⚙️ Ingeniería',law:'⚖️ Derecho',med:'🩺 Salud',multi:'🔬 Multi'}[lvl.disc]}</div>`;
+  const shuffled=[...lvl.items].sort(()=>Math.random()-.5);
+  body.innerHTML=`${dtag}<div class="q-stem">${lvl.stem}</div><div class="sort-list" id="slist"></div>
+  <button class="btn btn-full btn-orange" id="btn-chk" onclick="checkOrder()">VERIFICAR ORDEN ✓</button>`;
+  const list=body.querySelector('#slist');
+  shuffled.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='sort-item';d.dataset.order=item.order;d.draggable=true;
+    d.innerHTML=`<span class="drag-handle">⠿</span><span class="step-num">#${i+1}</span><span>${item.text}</span>`;
+    d.addEventListener('dragstart',e=>{S.orderDrag=d;d.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    d.addEventListener('dragend',()=>{d.classList.remove('dragging');S.orderDrag=null});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('drag-over')});
+    d.addEventListener('dragleave',()=>d.classList.remove('drag-over'));
+    d.addEventListener('drop',e=>{
+      e.preventDefault();d.classList.remove('drag-over');
+      if(S.orderDrag&&S.orderDrag!==d){
+        const its=[...list.children];const a=its.indexOf(S.orderDrag),b=its.indexOf(d);
+        if(a<b)list.insertBefore(S.orderDrag,d.nextSibling);else list.insertBefore(S.orderDrag,d);
+        [...list.children].forEach((el,i)=>el.querySelector('.step-num').textContent='#'+(i+1));
+      }
+    });
+    list.appendChild(d);
+  });
+}
+function checkOrder(){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  const lvl=LEVELS[S.cur];const list=document.getElementById('slist');let ok=true;
+  [...list.children].forEach((el,i)=>{const c=parseInt(el.dataset.order)===i+1;if(!c)ok=false;el.style.borderColor=c?'var(--green)':'var(--red)';el.style.background=c?'rgba(82,183,136,.07)':'rgba(230,57,70,.07)'});
+  document.getElementById('btn-chk').disabled=true;
+  if(ok)earnXP(lvl);else showFeedback(false,lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function startTimer(sec){
+  clearInterval(S.timer);S.timeLeft=sec;
+  const bar=document.getElementById('timer-bar'),num=document.getElementById('timer-num');
+  bar.className='timer-bar-fill';num.className='timer-num';bar.style.width='100%';num.textContent=sec;
+  S.timer=setInterval(()=>{
+    S.timeLeft--;bar.style.width=(S.timeLeft/sec*100)+'%';num.textContent=S.timeLeft;
+    if(S.timeLeft<=8){bar.className='timer-bar-fill danger';num.className='timer-num danger'}
+    if(S.timeLeft<=0){clearInterval(S.timer);if(!S.answered)timeOut()}
+  },1000);
+}
+function timeOut(){
+  if(S.answered)return;S.answered=true;
+  const lvl=LEVELS[S.cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===lvl.correct)b.classList.add('correct')});
+  ['btn-chk'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true});
+  showFeedback(false,'⏱ ¡Tiempo agotado! '+lvl.fb_err);
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+function earnXP(lvl){const b=Math.round((S.timeLeft/lvl.time)*50);S.xp+=lvl.xp+b;S.correct+=1;document.getElementById('st'+S.cur).classList.add('lit');document.getElementById('xp-display').textContent=S.xp+' XP';showFeedback(true,lvl.fb_ok+(b?` <em>+${b} XP ⚡</em>`:'')); }
+function showFeedback(ok,msg){const fb=document.getElementById('feedback');fb.className='feedback show '+(ok?'ok':'err');fb.innerHTML=msg}
+function nextLevel(){S.cur++;if(S.cur>=LEVELS.length)showResult();else loadLevel()}
+function showResult(){
+  hide('screen-game');show('screen-result');
+  const tt=Math.round((Date.now()-S.startTime)/1000);S._tt=tt;
+  const pct=Math.round((S.correct/LEVELS.length)*100);
+  let trophy='🥉',title='COMPLETADO',sub='Repasa las aplicaciones disciplinarias de la lógica.';
+  if(pct>=83){trophy='🏆';title='LÓGICA APLICADA',sub='Conectas la lógica con todas las disciplinas. ¡Semana 11!';}
+  else if(pct>=60){trophy='🥈';title='BUEN TRABAJO',sub='Refuerza los casos de derecho y diagnóstico médico.';}
+  document.getElementById('result-trophy').textContent=trophy;document.getElementById('result-title').textContent=title;document.getElementById('result-sub').textContent=sub;
+  document.getElementById('r-correct').textContent=`${S.correct}/6`;document.getElementById('r-xp').textContent=S.xp;document.getElementById('r-time').textContent=tt+'s';
+}
+async function saveResult(){
+  const btn=document.getElementById('btn-save'),lbl=document.getElementById('save-label');
+  btn.disabled=true;lbl.innerHTML='<span class="spinner"></span> Guardando...';
+  const p={plantel:S.plantel,matricula:S.matricula,nombre:S.nombre,semana:10,tema:"La Lógica en las Disciplinas",correctas:S.correct,total:LEVELS.length,xp:S.xp,porcentaje:Math.round((S.correct/LEVELS.length)*100),tiempoTotal:S._tt,fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})};
+  try{await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});showToast('✅ Resultado guardado','ok');lbl.textContent='✓ GUARDADO';}
+  catch(e){showToast('❌ Error','err');btn.disabled=false;lbl.textContent='Reintentar';}
+}
+function resetAll(){hide('screen-result');hide('screen-game');show('screen-login');for(let i=0;i<6;i++)document.getElementById('st'+i).classList.remove('lit');document.getElementById('xp-display').textContent='0 XP'}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showToast(msg,type){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
+</script>
+</body>
+</html>
